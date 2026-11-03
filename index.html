@@ -37,7 +37,7 @@ button:focus-visible,input:focus-visible{outline:4px solid var(--sun);outline-of
 .app{max-width:720px;margin:0 auto;min-height:100dvh;padding:12px max(14px,env(safe-area-inset-right)) 28px max(14px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .brand{font-family:var(--font-display);font-weight:400;font-size:1.45rem;margin:0}
-.iconbtn{border:2px solid var(--line);background:var(--surface);border-radius:999px;min-width:44px;height:44px;padding:0 12px;font-size:1rem;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.iconbtn{white-space:nowrap;border:2px solid var(--line);background:var(--surface);border-radius:999px;min-width:48px;height:48px;padding:0 12px;font-size:1rem;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8px}
 
 /* 마스코트 */
@@ -71,8 +71,8 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .go:active{transform:translateY(4px);box-shadow:0 2px 0 var(--sun-edge)}
 
 /* 놀이 */
-.stats{display:flex;align-items:center;gap:8px}
-.score{font-family:var(--font-display);font-size:1.15rem;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:2px 14px}
+.stats{display:flex;align-items:center;gap:6px}
+.score{white-space:nowrap;font-family:var(--font-display);font-size:1rem;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:2px 14px}
 .stats .sp{flex:1}
 .timer{font-variant-numeric:tabular-nums;min-width:4.6em;text-align:center}
 .timer.low{background:var(--oops-bg);border-color:var(--oops);color:var(--oops)}
@@ -81,7 +81,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .tbar.low i{background:var(--oops)}
 .giveup{background:var(--surface);border:3px solid var(--oops);border-radius:20px;padding:10px;text-align:center}
 .giveup p{margin:0 0 8px}
-.giveup .row button{border:0;border-radius:999px;padding:8px 20px;font-family:var(--font-display);font-size:1.2rem}
+.giveup .row button{border:0;border-radius:999px;padding:14px 26px;font-family:var(--font-display);font-size:1.4rem}
 .stage{display:flex;align-items:center;gap:10px}
 .stage .mascot{width:90px;height:90px}
 .card{flex:1;min-width:0;background:var(--surface);border:3px solid var(--line);border-radius:24px;padding:10px 14px;text-align:center}
@@ -100,12 +100,13 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .w u{text-decoration:none;color:var(--oops);font-size:1.15em}
 .chain .ar{color:var(--ink-soft);font-size:.8rem}
 .entry{display:flex;gap:8px}
-.entry input{flex:1;min-width:0;font:inherit;font-size:1.5rem;padding:8px 14px;border-radius:18px;border:3px solid var(--line);background:var(--surface);color:var(--ink);text-align:center}
+.entry input{flex:1;min-width:0;font:inherit;font-size:1.7rem;padding:16px 14px;border-radius:22px;border:3px solid var(--line);background:var(--surface);color:var(--ink);text-align:center}
 .entry input:focus{border-color:var(--primary);outline:none}
-.ok-btn{border:0;background:var(--primary);color:var(--primary-ink);border-radius:18px;padding:0 20px;font-family:var(--font-display);font-size:1.3rem;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.ok-btn{border:0;background:var(--primary);color:var(--primary-ink);border-radius:22px;padding:0 26px;min-width:4.6rem;font-family:var(--font-display);font-size:1.6rem;box-shadow:0 4px 0 rgba(0,0,0,.18)}
 .ok-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
-.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.tool{border:3px solid var(--line);background:var(--surface);border-radius:18px;padding:8px 4px;font-family:var(--font-display);font-size:1.05rem;line-height:1.2}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tool{border:3px solid var(--line);background:var(--surface);border-radius:22px;padding:18px 4px;min-height:5rem;font-family:var(--font-display);font-size:1.3rem;line-height:1.25;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.tool .ic{font-size:1.9rem;line-height:1}
 .tool.on{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
 .tool:disabled{opacity:.45}
 .pad{background:var(--surface);border:3px dashed var(--line);border-radius:18px;padding:8px}
@@ -116,8 +117,8 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .cands{display:flex;gap:6px;margin-top:6px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;min-height:36px}
 .chip{flex:none;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:0 14px;font-family:var(--font-display);font-size:1.2rem}
 .hints{display:flex;flex-wrap:wrap;gap:8px}
-.hint{border:3px solid var(--kid);background:var(--kid-soft);border-radius:18px;padding:4px 14px;font-family:var(--font-display);font-size:1.3rem}
-.quit{align-self:center;border:0;background:transparent;color:var(--ink-soft);text-decoration:underline;font-size:.9rem;padding:6px 12px}
+.hint{border:3px solid var(--kid);background:var(--kid-soft);border-radius:20px;padding:12px 18px;min-height:3.4rem;font-family:var(--font-display);font-size:1.5rem}
+.quit{align-self:center;border:2px solid var(--line);background:var(--surface);color:var(--ink-soft);border-radius:999px;font-size:1.1rem;padding:12px 28px;min-height:3.2rem}
 
 /* 결과 */
 .result{text-align:center}
@@ -128,7 +129,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .confetti{position:fixed;top:-2rem;font-size:1.6rem;pointer-events:none;animation:fall 2.6s linear forwards;z-index:9}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.confetti{display:none}.mascot{animation:none!important}}
-@media (max-width:420px){html{font-size:19px}.mascot{width:84px;height:84px}.stage .mascot{width:70px;height:70px}.hero .bubble{font-size:.92rem}}
+@media (max-width:420px){html{font-size:20px}.mascot{width:84px;height:84px}.stage .mascot{width:70px;height:70px}.hero .bubble{font-size:.92rem}}
 @media (max-height:640px){.padbox{height:110px}}
 </style>
 </head>
@@ -187,13 +188,13 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
     <div class="say" id="say" role="status" aria-live="polite"></div>
     <div class="chain" id="chain" aria-label="지금까지 이은 말"></div>
     <form class="entry" id="entry" autocomplete="off">
-      <input id="inp" type="text" inputmode="text" lang="ko" enterkeyhint="send" placeholder="여기에 말을 써요" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="낱말 입력">
+      <input id="inp" type="text" inputmode="text" lang="ko" enterkeyhint="send" placeholder="말을 써요" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="낱말 입력">
       <button class="ok-btn" type="submit">확인</button>
     </form>
     <div class="tools" style="margin-top:8px">
-      <button class="tool" id="bMic">🎙️ 말하기</button>
-      <button class="tool" id="bPen">✍️ 쓰기</button>
-      <button class="tool" id="bHint">💡 힌트</button>
+      <button class="tool" id="bMic"><span class="ic">🎙️</span>말하기</button>
+      <button class="tool" id="bPen"><span class="ic">✍️</span>쓰기</button>
+      <button class="tool" id="bHint"><span class="ic">💡</span>힌트</button>
     </div>
     <div class="pad" id="pad" hidden style="margin-top:8px">
       <div class="padbox" id="padbox"><canvas id="cv"></canvas><div class="ph" id="ph">여기에 손가락으로 써 보세요</div></div>
@@ -415,7 +416,7 @@ function showNeed(){
 function updateStats(){
   $('#score').textContent = `이은 말 ${G.kidCount}`;
   $('#stars').textContent = `⭐ ${G.stars}`;
-  $('#bHint').textContent = G.hintsLeft === Infinity ? '💡 힌트' : `💡 힌트 ${G.hintsLeft}`;
+  $('#bHint').innerHTML = '<span class="ic">💡</span>' + (G.hintsLeft === Infinity ? '힌트' : `힌트 ${G.hintsLeft}`);
   $('#bHint').disabled = G.hintsLeft <= 0;
 }
 function setBusy(b){ G.busy = b; $('#inp').disabled = b; $('#entry button').disabled = b; $('#bMic').disabled = b; $('#bPen').disabled = b; $('#bHint').disabled = b || G.hintsLeft <= 0; }
@@ -595,7 +596,7 @@ $('#entry').onsubmit = (e) => { e.preventDefault(); submit($('#inp').value); };
 // 말하기 (브라우저 음성 인식)
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null;
-function stopMic(){ if (rec){ try{ rec.abort(); }catch(e){} rec = null; } $('#bMic').classList.remove('on'); $('#bMic').textContent = '🎙️ 말하기'; }
+function stopMic(){ if (rec){ try{ rec.abort(); }catch(e){} rec = null; } $('#bMic').classList.remove('on'); $('#bMic').innerHTML = '<span class="ic">🎙️</span>말하기'; }
 $('#bMic').onclick = () => {
   if (G.busy) return;
   if (!SR){ line('oops', '이 기기는 말하기를 지원하지 않아요. 글자로 써 주세요.'); return; }
@@ -604,7 +605,7 @@ $('#bMic').onclick = () => {
   closePanels();
   rec = new SR(); rec.lang = 'ko-KR'; rec.interimResults = true; rec.maxAlternatives = 5; rec.continuous = false;
   let finals = [];
-  rec.onstart = () => { $('#bMic').classList.add('on'); $('#bMic').textContent = '👂 듣는 중…'; line('', '말해 보세요…'); };
+  rec.onstart = () => { $('#bMic').classList.add('on'); $('#bMic').innerHTML = '<span class="ic">👂</span>듣는 중…'; line('', '말해 보세요…'); };
   rec.onresult = (e) => {
     let t = '';
     for (const r of e.results){ t += r[0].transcript; if (r.isFinal) finals = [...r].map(a => a.transcript); }
@@ -612,7 +613,7 @@ $('#bMic').onclick = () => {
   };
   rec.onerror = (e) => { line('oops', e.error === 'not-allowed' ? '마이크를 쓸 수 있게 허락해 주세요.' : e.error === 'no-speech' ? '소리가 안 들렸어요. 다시 말해 볼까요?' : '잘 못 들었어요. 다시 해 봐요.'); };
   rec.onend = () => {
-    const mine = rec; rec = null; $('#bMic').classList.remove('on'); $('#bMic').textContent = '🎙️ 말하기';
+    const mine = rec; rec = null; $('#bMic').classList.remove('on'); $('#bMic').innerHTML = '<span class="ic">🎙️</span>말하기';
     const alts = finals.map(normalize).filter(w => sylls(w).length >= 2);
     if (!alts.length) return;
     const best = alts.find(w => startsOk(w, G.req) && !G.used.has(w) && known(w)) || alts.find(w => startsOk(w, G.req) && !G.used.has(w)) || alts[0];
