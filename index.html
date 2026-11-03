@@ -134,9 +134,9 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 @media (prefers-reduced-motion:reduce){.confetti{display:none}.mascot{animation:none!important}}
 @media (max-width:420px){.hero .bubble{font-size:.92rem}}
 
-/* 가로로 눕힌 낮은 화면(태블릿·폰 가로): 좌우 2단으로 한 화면에 */
+/* 가로 화면(태블릿·폰 가로·PC): 좌우 2단으로 한 화면에 */
 .colA,.colB{display:contents}
-@media (orientation:landscape) and (max-height:700px) and (min-width:700px){
+@media (orientation:landscape) and (min-width:700px){
   html{font-size:clamp(13px,min(3.6vh,2.1vw),22px)}
   .app{max-width:1040px}
   #home{display:grid;grid-template-columns:1fr 1.15fr;grid-template-areas:"hero g1" "hero g2" "best go";gap:.4rem 1.2rem;align-items:center}
@@ -145,6 +145,16 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
   #play{display:grid;grid-template-columns:1fr 1fr;gap:0 1.2rem;align-items:start}
   .colA,.colB{display:flex;flex-direction:column;gap:.4rem;min-width:0}
   .chain{max-height:4.6rem}
+  /* 낮은 화면에서는 키운 버튼을 한 단계 줄여 한 화면에 맞춤(터치 크기는 충분히 유지) */
+  .tool{min-height:3.3rem;padding:.4rem 4px;flex-direction:row;gap:.35rem;font-size:1.1rem} .tool .ic{font-size:1.3rem}
+  .entry input{padding:.45rem 14px;font-size:1.4rem} .ok-btn{font-size:1.3rem}
+  .hint{min-height:0;padding:.35rem 14px;font-size:1.2rem} .quit{min-height:0;padding:.3rem 1.2rem;font-size:.95rem}
+  .giveup .row button{padding:.5rem 1.2rem;font-size:1.2rem}
+}
+/* 키가 작은 세로 화면(작은 폰): 버튼 높이를 조금만 줄임 */
+@media (orientation:portrait) and (max-height:700px){
+  .tool{min-height:3.8rem;padding:.6rem 4px} .quit{min-height:2.6rem;padding:.4rem 1.5rem}
+  .entry input{padding:.6rem 14px}
 }
 @media (orientation:landscape) and (max-height:420px){
   html{font-size:clamp(10.5px,3.15vh,22px)}
