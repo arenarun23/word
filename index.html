@@ -30,18 +30,18 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{font-size:22px}
+html{font-size:clamp(13px,min(2.95vh,4.9vw),22px)} /* 화면 높이·폭에 맞춰 전체 크기 자동 조절 */
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:1.05rem;font-weight:700;line-height:1.45;overscroll-behavior:none}
 button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 button:focus-visible,input:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
-.app{max-width:720px;margin:0 auto;min-height:100dvh;padding:12px max(14px,env(safe-area-inset-right)) 28px max(14px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+.app{max-width:720px;margin:0 auto;min-height:100dvh;padding:.5rem max(14px,env(safe-area-inset-right)) 1rem max(14px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:.5rem}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .brand{font-family:var(--font-display);font-weight:400;font-size:1.45rem;margin:0}
 .iconbtn{white-space:nowrap;border:2px solid var(--line);background:var(--surface);border-radius:999px;min-width:48px;height:48px;padding:0 12px;font-size:1rem;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8px}
 
 /* 마스코트 */
-.mascot{width:110px;height:110px;flex:none;overflow:visible}
+.mascot{width:5rem;height:5rem;flex:none;overflow:visible}
 .mascot .m-happy,.mascot .m-oops,.mascot .m-talk,.mascot .e-happy{display:none}
 .mascot[data-mood="cheer"] .e-open{display:none}
 .mascot[data-mood="cheer"] .e-happy{display:inline}
@@ -83,7 +83,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .giveup p{margin:0 0 8px}
 .giveup .row button{border:0;border-radius:999px;padding:14px 26px;font-family:var(--font-display);font-size:1.4rem}
 .stage{display:flex;align-items:center;gap:10px}
-.stage .mascot{width:90px;height:90px}
+.stage .mascot{width:4.1rem;height:4.1rem}
 .card{flex:1;min-width:0;background:var(--surface);border:3px solid var(--line);border-radius:24px;padding:10px 14px;text-align:center}
 .card .who{font-size:.8rem;color:var(--ink-soft)}
 .card .big{font-family:var(--font-display);font-weight:400;font-size:clamp(2.2rem,11vw,3.6rem);line-height:1.15;word-break:keep-all;overflow-wrap:anywhere}
@@ -110,7 +110,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .tool.on{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
 .tool:disabled{opacity:.45}
 .pad{background:var(--surface);border:3px dashed var(--line);border-radius:18px;padding:8px}
-.padbox{position:relative;height:150px;border-radius:12px;background:
+.padbox{position:relative;height:6.2rem;border-radius:12px;background:
   linear-gradient(var(--line) 1px,transparent 1px) 0 50%/100% 100% no-repeat,var(--bg)}
 .padbox canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
 .padbox .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-soft);pointer-events:none;font-size:1rem}
@@ -132,8 +132,25 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .confetti{position:fixed;top:-2rem;font-size:1.6rem;pointer-events:none;animation:fall 2.6s linear forwards;z-index:9}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.confetti{display:none}.mascot{animation:none!important}}
-@media (max-width:420px){html{font-size:20px}.mascot{width:84px;height:84px}.stage .mascot{width:70px;height:70px}.hero .bubble{font-size:.92rem}}
-@media (max-height:640px){.padbox{height:110px}}
+@media (max-width:420px){.hero .bubble{font-size:.92rem}}
+
+/* 가로로 눕힌 낮은 화면(태블릿·폰 가로): 좌우 2단으로 한 화면에 */
+.colA,.colB{display:contents}
+@media (orientation:landscape) and (max-height:700px) and (min-width:700px){
+  html{font-size:clamp(13px,min(3.6vh,2.1vw),22px)}
+  .app{max-width:1040px}
+  #home{display:grid;grid-template-columns:1fr 1.15fr;grid-template-areas:"hero g1" "hero g2" "best go";gap:.4rem 1.2rem;align-items:center}
+  #home .hero{grid-area:hero} #home .group:nth-of-type(1){grid-area:g1} #home .group:nth-of-type(2){grid-area:g2}
+  #home .group{margin:0!important} #home .best{grid-area:best;margin:0} #home .go{grid-area:go;margin:0 auto}
+  #play{display:grid;grid-template-columns:1fr 1fr;gap:0 1.2rem;align-items:start}
+  .colA,.colB{display:flex;flex-direction:column;gap:.4rem;min-width:0}
+  .chain{max-height:4.6rem}
+}
+@media (orientation:landscape) and (max-height:420px){
+  html{font-size:clamp(10.5px,3.15vh,22px)}
+  .app{padding-top:.2rem;padding-bottom:.3rem;gap:.3rem} .iconbtn{min-width:38px;height:38px}
+  #home .hero .mascot{width:3.4rem;height:3.4rem} .go{padding-top:.4rem;padding-bottom:.4rem}
+}
 </style>
 </head>
 <body>
@@ -179,6 +196,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 
   <!-- 놀이 -->
   <section id="play" hidden>
+   <div class="colA">
     <div class="stats"><span class="score" id="score">이은 말 0</span><span class="score" id="stars">⭐ 0</span><span class="score timer" id="timer">⏱ 20</span><span class="sp"></span><button class="iconbtn" id="btnQuitTop" aria-label="정지">⏹ 정지</button></div>
     <div class="tbar" id="tbar" aria-hidden="true"><i id="tfill"></i></div>
     <div class="stage" style="margin-top:10px"><span class="mascot-slot" id="stageMascot"></span>
@@ -190,6 +208,8 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
     </div>
     <div class="say" id="say" role="status" aria-live="polite"></div>
     <div class="chain" id="chain" aria-label="지금까지 이은 말"></div>
+   </div>
+   <div class="colB">
     <form class="entry" id="entry" autocomplete="off">
       <input id="inp" type="text" inputmode="text" lang="ko" enterkeyhint="send" placeholder="말을 써요" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="낱말 입력">
       <button class="ok-btn" type="submit">확인</button>
@@ -207,6 +227,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
     <div class="hints" id="hints" hidden style="margin-top:8px"></div>
     <div class="hints" id="heard" hidden style="margin-top:8px"></div>
     <button class="quit" id="btnQuit">그만하기</button>
+   </div>
   </section>
 
   <!-- 결과 -->
