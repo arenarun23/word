@@ -161,14 +161,16 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
   .app{padding-top:.2rem;padding-bottom:.3rem;gap:.3rem} .iconbtn{min-width:38px;height:38px}
   #home .hero .mascot{width:3.4rem;height:3.4rem} .go{padding-top:.4rem;padding-bottom:.4rem}
 }
-/* AIEDU 허브로 가는 아이콘(모든 서비스 공통 모양) */
-.aiedu-home{display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;border-radius:50%;background:linear-gradient(160deg,#ffe58f,#ffb08e);border:2px solid #fff;box-shadow:0 2px 0 rgba(74,52,38,.22);text-decoration:none;-webkit-tap-highlight-color:transparent}
+/* AIEDU 허브로 가는 아이콘 — 모든 서비스 공통 모양·위치: 페이지 왼쪽 위(body 첫 요소). 앱마다 이 자리를 비워 둔다 */
+.aiedu-home{position:absolute;left:max(8px,env(safe-area-inset-left,0px));top:max(8px,env(safe-area-inset-top,0px));z-index:1000;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:linear-gradient(160deg,#ffe58f,#ffb08e);border:2px solid #fff;box-shadow:0 2px 0 rgba(74,52,38,.22);text-decoration:none;-webkit-tap-highlight-color:transparent}
 .aiedu-home svg{width:30px;height:30px;display:block}
 .aiedu-home:active{transform:translateY(2px);box-shadow:none}
 .aiedu-home:focus-visible{outline:3px solid #f08a00;outline-offset:2px}
+.top{padding-left:52px}
 </style>
 </head>
 <body>
+<a class="aiedu-home" href="../" title="AIEDU 처음으로" aria-label="AIEDU 허브로 돌아가기"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><polygon points="32,6 39.2,23.6 58,25.2 43.7,37.6 48.1,56 32,46.2 15.9,56 20.3,37.6 6,25.2 24.8,23.6" fill="#ff7aa8" stroke="#ff7aa8" stroke-width="6" stroke-linejoin="round"/><ellipse cx="25.5" cy="33" rx="2.4" ry="3.2" fill="#4a3426"/><ellipse cx="38.5" cy="33" rx="2.4" ry="3.2" fill="#4a3426"/><ellipse cx="20.5" cy="39.5" rx="3.4" ry="2.1" fill="#ff4f86" opacity=".5"/><ellipse cx="43.5" cy="39.5" rx="3.4" ry="2.1" fill="#ff4f86" opacity=".5"/><path d="M28 39.5q4 4.4 8 0" fill="none" stroke="#4a3426" stroke-width="2.4" stroke-linecap="round"/></svg></a>
 <template id="mascotTpl">
 <svg class="mascot" data-mood="happy" viewBox="0 0 120 120" aria-hidden="true">
   <ellipse cx="60" cy="112" rx="34" ry="5" fill="#000" opacity=".12"/>
@@ -185,7 +187,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 
 <div class="app">
   <header class="top">
-    <div style="display:flex;align-items:center;gap:8px;min-width:0"><a class="aiedu-home" href="../" title="AIEDU 처음으로" aria-label="AIEDU 허브로 돌아가기"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><polygon points="32,6 39.2,23.6 58,25.2 43.7,37.6 48.1,56 32,46.2 15.9,56 20.3,37.6 6,25.2 24.8,23.6" fill="#ff7aa8" stroke="#ff7aa8" stroke-width="6" stroke-linejoin="round"/><ellipse cx="25.5" cy="33" rx="2.4" ry="3.2" fill="#4a3426"/><ellipse cx="38.5" cy="33" rx="2.4" ry="3.2" fill="#4a3426"/><ellipse cx="20.5" cy="39.5" rx="3.4" ry="2.1" fill="#ff4f86" opacity=".5"/><ellipse cx="43.5" cy="39.5" rx="3.4" ry="2.1" fill="#ff4f86" opacity=".5"/><path d="M28 39.5q4 4.4 8 0" fill="none" stroke="#4a3426" stroke-width="2.4" stroke-linecap="round"/></svg></a><h1 class="brand">🔗 끝말잇기 놀이터</h1></div>
+    <h1 class="brand">🔗 끝말잇기 놀이터</h1>
     <div style="display:flex;gap:6px">
       <button class="iconbtn" id="btnSound" aria-label="소리 켜기/끄기">🔊</button>
       <button class="iconbtn" id="btnHome" aria-label="처음으로" hidden>🏠</button>
