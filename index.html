@@ -71,7 +71,11 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .go:active{transform:translateY(4px);box-shadow:0 2px 0 var(--sun-edge)}
 
 /* 놀이 */
-.stats{display:flex;align-items:center;gap:6px}
+.stats{display:flex;align-items:center;gap:5px;flex-wrap:nowrap}
+.stats .score{font-size:.92rem;padding:2px 10px}
+.stats .iconbtn{min-width:0;padding:0 9px;font-size:.88rem;white-space:nowrap;flex:none}
+.stats .timer{min-width:3.9em}
+@media (max-width:400px){.stats{gap:3px}.stats .score{font-size:.8rem;padding:2px 7px}.stats .iconbtn{font-size:.78rem;padding:0 6px;min-height:44px;height:44px}.stats .timer{min-width:3.4em}}
 .score{white-space:nowrap;font-family:var(--font-display);font-size:1rem;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:2px 14px}
 .stats .sp{flex:1}
 .timer{font-variant-numeric:tabular-nums;min-width:4.6em;text-align:center}
@@ -80,6 +84,8 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .tbar i{display:block;height:100%;width:100%;background:var(--ok);border-radius:99px;transition:width .25s linear,background .25s}
 .tbar.low i{background:var(--oops)}
 .giveup{background:var(--surface);border:3px solid var(--oops);border-radius:20px;padding:10px;text-align:center}
+.pausebox{border-color:var(--primary)}
+.timer.frozen{background:var(--primary-soft);border-color:var(--primary);color:var(--ink)}
 .giveup p{margin:0 0 8px}
 .giveup .row button{border:0;border-radius:999px;padding:14px 26px;font-family:var(--font-display);font-size:1.4rem}
 .stage{display:flex;align-items:center;gap:10px}
@@ -223,10 +229,14 @@ a.draggable=false;})();
   <!-- 놀이 -->
   <section id="play" hidden>
    <div class="colA">
-    <div class="stats"><span class="score" id="score">이은 말 0</span><span class="score" id="stars">⭐ 0</span><span class="score timer" id="timer">⏱ 20</span><span class="sp"></span><button class="iconbtn" id="btnQuitTop" aria-label="정지">⏹ 정지</button></div>
+    <div class="stats"><span class="score" id="score">말 0</span><span class="score" id="stars">⭐ 0</span><span class="score timer" id="timer">⏱ 20</span><span class="sp"></span><button class="iconbtn" id="btnPause" aria-label="잠깐 멈추기">⏸ 중지</button><button class="iconbtn" id="btnQuitTop" aria-label="정지(끝내기)">⏹ 정지</button></div>
     <div class="tbar" id="tbar" aria-hidden="true"><i id="tfill"></i></div>
     <div class="stage" style="margin-top:10px"><span class="mascot-slot" id="stageMascot"></span>
       <div class="card"><div class="who" id="who"></div><div class="big" id="big">…</div><div class="pic" id="pic"></div><div class="need" id="need"></div></div>
+    </div>
+    <div class="giveup pausebox" id="pausebox" hidden style="margin-top:10px">
+      <p>⏸ 잠깐 멈췄어요. 준비되면 계속해요!</p>
+      <div class="row"><button id="btnResume" style="background:var(--sun);color:var(--sun-ink)">▶ 계속하기</button><button id="btnStop2" style="background:var(--oops);color:#fff">⏹ 정지</button></div>
     </div>
     <div class="giveup" id="giveup" hidden style="margin-top:10px">
       <p>처음부터 다시해볼까? 아니면 그만할까?<br>그만하고 싶으면 정지 버튼을 눌러줘.</p>
@@ -428,7 +438,7 @@ const views = { home: $('#home'), play: $('#play'), result: $('#result') };
 function show(v){
   for (const k in views) views[k].hidden = k !== v;
   $('#btnHome').hidden = v === 'home';
-  if (v !== 'play') { stopTimer(); stopMic(); try{ speechSynthesis.cancel(); }catch(e){} setSpeaking(false); }
+  if (v !== 'play') { stopTimer(); G.paused = false; $('#pausebox').hidden = true; stopMic(); try{ speechSynthesis.cancel(); }catch(e){} setSpeaking(false); }
   window.scrollTo(0, 0);
 }
 let opts = { first: store.get('wc-first', 'bot'), level: store.get('wc-level', 'easy') };
@@ -465,16 +475,16 @@ function showNeed(){
   n.innerHTML = `<b>${esc(a)}</b>${rest.length ? '<small>(' + rest.map(esc).join(' · ') + ' 도 돼요)</small>' : ''} (으)로 시작하는 말!`;
 }
 function updateStats(){
-  $('#score').textContent = `이은 말 ${G.kidCount}`;
+  $('#score').textContent = `말 ${G.kidCount}`;
   $('#stars').textContent = `⭐ ${G.stars}`;
   $('#bHint').innerHTML = '<span class="ic">💡</span>' + (G.hintsLeft === Infinity ? '힌트' : `힌트 ${G.hintsLeft}`);
   $('#bHint').disabled = G.hintsLeft <= 0;
 }
-function setBusy(b){ G.busy = b; $('#inp').disabled = b; $('#entry button').disabled = b; $('#bMic').disabled = b; $('#bPen').disabled = b; $('#bHint').disabled = b || G.hintsLeft <= 0; }
+function setBusy(b){ G.busy = b; $('#inp').disabled = b; $('#entry button').disabled = b; $('#bMic').disabled = b; $('#bPen').disabled = b; $('#bHint').disabled = b || G.hintsLeft <= 0; $('#btnPause').disabled = b; }
 
 function startGame(){
   Object.assign(G, { chain: [], used: new Set(), req: null, stars: 0, kidCount: 0, hintsLeft: opts.level === 'hard' ? 3 : Infinity, busy: false, over: false });
-  show('play'); closePanels(); stopTimer(); $('#giveup').hidden = true; paintTimer(LIMIT); updateStats();
+  show('play'); closePanels(); stopTimer(); frozen = false; G.paused = false; $('#pausebox').hidden = true; $('#giveup').hidden = true; paintTimer(LIMIT); updateStats();
   $('#inp').value = ''; $('#chain').innerHTML = ''; $('#pic').textContent = ''; mood('happy');
   if (opts.first === 'bot'){
     $('#who').textContent = ''; $('#big').textContent = '…';
@@ -490,23 +500,26 @@ function startGame(){
 
 /* ───────── 대답 시간: 20초 카운트다운, 못 하면 한 번 더 기회 ───────── */
 const LIMIT = 20;
-let tmr = null, tEnd = 0, strikes = 0;
+let tmr = null, tEnd = 0, strikes = 0, tLeft = LIMIT, frozen = false;
+G.paused = false;
 function stopTimer(){ clearInterval(tmr); tmr = null; }
-function paintTimer(left){
+function paintTimer(left, icon){
   const s = Math.max(0, Math.ceil(left));
-  $('#timer').textContent = `⏱ ${s}`;
-  const low = left <= 5;
-  $('#timer').classList.toggle('low', low); $('#tbar').classList.toggle('low', low);
+  $('#timer').textContent = `${icon || '⏱'} ${s}`;
+  const low = left <= 5 && !icon;
+  $('#timer').classList.toggle('low', low); $('#tbar').classList.toggle('low', low); $('#timer').classList.toggle('frozen', !!icon);
   $('#tfill').style.width = Math.max(0, left / LIMIT * 100) + '%';
 }
-function startTimer(){
+function runTimer(sec){
   stopTimer(); if (G.over) return;
-  tEnd = Date.now() + LIMIT * 1000; paintTimer(LIMIT);
+  tLeft = sec; tEnd = Date.now() + sec * 1000; paintTimer(sec);
   tmr = setInterval(() => {
     const left = (tEnd - Date.now()) / 1000;
-    if (left <= 0){ stopTimer(); paintTimer(0); timeUp(); } else paintTimer(left);
+    if (left <= 0){ stopTimer(); tLeft = 0; paintTimer(0); timeUp(); } else { tLeft = left; paintTimer(left); }
   }, 250);
 }
+function startTimer(){ frozen = false; runTimer(LIMIT); }
+function freezeTimer(){ if (tmr) tLeft = Math.max(0, (tEnd - Date.now()) / 1000); stopTimer(); paintTimer(tLeft, '⏸'); }   // 남은 시간을 기억하고 멈춤
 function timeUp(){
   if (G.over || G.busy) return;
   stopMic(); closePanels();
@@ -517,11 +530,25 @@ function timeUp(){
     speak('다시 생각해 보자.', () => { if (!G.over) startTimer(); });
   } else {
     line('oops', '처음부터 다시해볼까? 아니면 그만할까? 그만하고 싶으면 정지 버튼을 눌러줘.');
-    $('#giveup').hidden = false; $('#inp').disabled = true; $('#entry button').disabled = true; $('#bMic').disabled = true; $('#bPen').disabled = true; $('#bHint').disabled = true;
+    $('#giveup').hidden = false; $('#btnPause').disabled = true; $('#inp').disabled = true; $('#entry button').disabled = true; $('#bMic').disabled = true; $('#bPen').disabled = true; $('#bHint').disabled = true;
     speak('처음부터 다시해볼까? 아니면 그만할까? 그만하고 싶으면 정지 버튼을 눌러줘.');
   }
 }
 function turnStart(){ strikes = 0; $('#giveup').hidden = true; startTimer(); }
+
+/* ⏸ 중지: 잠깐 멈췄다가 ▶ 계속하기 (⏹ 정지는 놀이를 끝냄) */
+function pauseGame(){
+  if (G.busy || G.over || G.paused || !$('#giveup').hidden) return;
+  G.paused = true; freezeTimer(); stopMic(); closePanels(); try{ speechSynthesis.cancel(); }catch(e){} setSpeaking(false);
+  $('#inp').disabled = true; $('#entry button').disabled = true; $('#bMic').disabled = true; $('#bPen').disabled = true; $('#bHint').disabled = true; $('#btnPause').disabled = true;
+  $('#pausebox').hidden = false; mood('happy'); line('', '잠깐 멈췄어요. 준비되면 [계속하기]를 눌러요!');
+}
+function resumeGame(){
+  if (!G.paused || G.over) return;
+  G.paused = false; $('#pausebox').hidden = true; setBusy(false);
+  if (!frozen && tLeft > 0) runTimer(tLeft);     // 멈췄던 남은 시간부터 다시
+  line('', '다시 시작! 이어서 해 봐요.'); $('#inp').focus({ preventScroll: true });
+}
 
 /* 아이가 낸 말 처리 */
 function normalize(raw){
@@ -544,7 +571,7 @@ function submit(raw, fromHint){
   if (G.used.has(word)){ mood('oops'); beep([260, 200]); line('oops', `‘${word}’은(는) 벌써 나온 말이에요. 다른 말을 해 볼까요?`); return; }
 
   // 통과!
-  stopTimer(); strikes = 0; voiceFails = 0; paintTimer(LIMIT);
+  stopTimer(); frozen = false; strikes = 0; voiceFails = 0; paintTimer(LIMIT);
   const isKnown = known(word);
   G.used.add(word);
   G.chain.push({ who: 'kid', word, emoji: emojiOf(word) });
@@ -610,7 +637,7 @@ function botTurn(prev, lead){
 /* 끝내기 */
 function finish(kidWins){
   if (G.over) return;
-  G.over = true; stopTimer(); stopMic(); setBusy(true); $('#giveup').hidden = true;
+  G.over = true; stopTimer(); stopMic(); setBusy(true); G.paused = false; $('#pausebox').hidden = true; $('#giveup').hidden = true;
   const n = G.kidCount, prevBest = +store.get('wc-best', '0');
   const newBest = n > prevBest;
   if (newBest) store.set('wc-best', String(n));
@@ -739,7 +766,7 @@ $('#bMic').onclick = () => {
   rec.onerror = (e) => { err = e.error; };
   rec.onend = () => {
     clearTimeout(early); rec = null; $('#bMic').classList.remove('on'); $('#bMic').innerHTML = '<span class="ic">🎙️</span>말하기';
-    if (G.busy || G.over) return;
+    if (G.busy || G.over || G.paused) return;
     if ([...finals, interim].some(saysIDK)){ voiceFails = 0; giveHelp(); return; }
     const alts = wordsFrom(finals.length ? finals : interim ? [interim] : []);
     if (err === 'not-allowed' || err === 'service-not-allowed'){ line('oops', '마이크를 쓸 수 없어요. 손으로 써 볼까요?'); if ($('#pad').hidden) $('#bPen').click(); return; }
@@ -834,7 +861,8 @@ $('#bHint').onclick = () => {
 const IDK = /(모르겠|몰라|모름|도와|도움|힌트|어려워|어렵|생각이?안|기억이?안|잘모|모르)/;
 const saysIDK = (t) => { const c = (t || '').replace(/[^가-힣]/g, ''); return c.length > 0 && c.length <= 14 && IDK.test(c); };
 function giveHelp(){
-  if (G.busy || G.over) return false;
+  if (G.busy || G.over || G.paused) return false;
+  freezeTimer(); frozen = true;      // "모르겠어"라고 하면 시간 카운트를 멈춤 (낱말을 고르거나 계속할 때까지)
   if (G.hintsLeft <= 0){ mood('happy'); line('', '힌트를 다 썼어. 천천히 다시 생각해 보자! 할 수 있어!'); speak('힌트를 다 썼어. 천천히 다시 생각해 보자!'); return true; }
   stopMic(); showHints(true); return true;
 }
@@ -847,6 +875,7 @@ $('#btnRestart').onclick = startGame;
 $('#btnStop').onclick = () => finish(false);
 $('#btnHome2').onclick = () => show('home');
 const quit = () => { if (G.over) return; finish(false); };
+$('#btnPause').onclick = pauseGame; $('#btnResume').onclick = resumeGame; $('#btnStop2').onclick = () => finish(false);
 $('#btnQuit').onclick = quit; $('#btnQuitTop').onclick = quit;
 try{ speechSynthesis.getVoices(); }catch(e){}
 window.__wc = { G, startsFor, pickBot, known, KID, EXTRA, get fuzzy(){ return fuzzy; } };   // 테스트용
