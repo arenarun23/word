@@ -173,6 +173,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .aiedu-home:focus-visible{outline:3px solid #f08a00;outline-offset:2px}
 .top{padding-left:52px}
 </style>
+<script src="../aiedu-log.js"></script>
 </head>
 <body>
 <a class="aiedu-home" href="../" title="AIEDU 처음으로" aria-label="AIEDU 허브로 돌아가기"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><polygon points="32,6 39.2,23.6 58,25.2 43.7,37.6 48.1,56 32,46.2 15.9,56 20.3,37.6 6,25.2 24.8,23.6" fill="#ff7aa8" stroke="#ff7aa8" stroke-width="6" stroke-linejoin="round"/><ellipse cx="25.5" cy="33" rx="2.4" ry="3.2" fill="#4a3426"/><ellipse cx="38.5" cy="33" rx="2.4" ry="3.2" fill="#4a3426"/><ellipse cx="20.5" cy="39.5" rx="3.4" ry="2.1" fill="#ff4f86" opacity=".5"/><ellipse cx="43.5" cy="39.5" rx="3.4" ry="2.1" fill="#ff4f86" opacity=".5"/><path d="M28 39.5q4 4.4 8 0" fill="none" stroke="#4a3426" stroke-width="2.4" stroke-linecap="round"/></svg></a>
@@ -482,6 +483,7 @@ function updateStats(){
 function setBusy(b){ G.busy = b; $('#inp').disabled = b; $('#entry button').disabled = b; $('#bMic').disabled = b; $('#bPen').disabled = b; $('#bHint').disabled = b || G.hintsLeft <= 0; $('#btnPause').disabled = b; }
 
 function startGame(){
+  window.aieduLog && aieduLog('start');   // 이용 기록(익명)
   Object.assign(G, { chain: [], used: new Set(), req: null, stars: 0, kidCount: 0, hintsLeft: opts.level === 'hard' ? 3 : Infinity, busy: false, over: false });
   show('play'); closePanels(); stopTimer(); frozen = false; G.paused = false; $('#pausebox').hidden = true; $('#giveup').hidden = true; paintTimer(LIMIT); updateStats();
   $('#inp').value = ''; $('#chain').innerHTML = ''; $('#pic').textContent = ''; mood('happy');
@@ -636,6 +638,7 @@ function botTurn(prev, lead){
 /* 끝내기 */
 function finish(kidWins){
   if (G.over) return;
+  window.aieduLog && aieduLog('finish', kidWins ? 'kidwin' : 'botwin');
   G.over = true; stopTimer(); stopMic(); setBusy(true); G.paused = false; $('#pausebox').hidden = true; $('#giveup').hidden = true;
   const n = G.kidCount, prevBest = +store.get('wc-best', '0');
   const newBest = n > prevBest;
