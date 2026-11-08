@@ -161,6 +161,28 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
   .tool{min-height:3.8rem;padding:.6rem 4px} .quit{min-height:2.6rem;padding:.4rem 1.5rem}
   .entry input{padding:.6rem 14px}
 }
+/* 세로 화면에서 ✍️ 필기판을 열면: 가운데 버튼은 한 줄로 줄이고, 글씨 쓰는 칸이 남는 화면을 모두 차지 */
+@media (orientation:portrait){
+  .app:has(#play.padopen){min-height:100dvh}
+  #play.padopen{display:flex;flex-direction:column;gap:.45rem;flex:1;min-height:0}
+  #play.padopen .chain,#play.padopen .quit{display:none}
+  #play.padopen .tools{gap:6px}
+  #play.padopen .tool{min-height:2.7rem;padding:.2rem 4px;flex-direction:row;gap:.3rem;font-size:1rem;border-radius:16px;border-width:2px} #play.padopen .tool .ic{font-size:1.25rem}
+  #play.padopen .stage .mascot{width:3.4rem;height:3.4rem} #play.padopen .card{padding:.3rem .6rem}
+  #play.padopen .card .big{font-size:clamp(1.6rem,8.5vw,2.5rem)} #play.padopen .card .pic{font-size:1.5rem;min-height:0} #play.padopen .card .need{font-size:.85rem;margin-top:0} #play.padopen .need b{font-size:1.2rem}
+  #play.padopen .say{min-height:0;padding:.2rem .6rem;margin-top:0;font-size:.85rem}
+  #play.padopen .entry input{padding:.35rem 12px;font-size:1.4rem;border-radius:16px} #play.padopen .ok-btn{font-size:1.3rem;border-radius:16px}
+  #play.padopen .pad{flex:1 1 auto;min-height:12rem;display:flex;flex-direction:column;margin-top:0!important}
+  #play.padopen .padbox{flex:1 1 auto;height:auto;min-height:9rem}
+  #play.padopen .cands{min-height:34px} #play.padopen .cands:empty{display:none}
+  body.padopen .brand{font-size:1.05rem;white-space:nowrap}
+  body.padopen .top .iconbtn{min-width:40px;height:40px}
+  #play.padopen .card .who{display:none} #play.padopen .stage .mascot{display:none}
+  #play.padopen .tbar{height:6px;margin-top:4px}
+}
+@media (orientation:portrait) and (max-height:700px){
+  #play.padopen .card .pic{display:none}
+}
 @media (orientation:landscape) and (max-height:420px){
   html{font-size:clamp(10.5px,3.15vh,22px)}
   .app{padding-top:.2rem;padding-bottom:.3rem;gap:.3rem} .iconbtn{min-width:38px;height:38px}
@@ -825,10 +847,10 @@ async function recognize(){
     line('', `이렇게 읽었어요: ‘${best}’. 맞으면 [확인]을 눌러요!`);
   }catch(e){ if (id === recogId) line('oops', '글씨 읽기가 안 돼요. 키보드나 말하기를 써 주세요.'); }
 }
-function closePanels(){ $('#pad').hidden = true; $('#hints').hidden = true; $('#heard').hidden = true; $('#bPen').classList.remove('on'); }
+function closePanels(){ $('#play').classList.remove('padopen'); document.body.classList.remove('padopen'); $('#pad').hidden = true; $('#hints').hidden = true; $('#heard').hidden = true; $('#bPen').classList.remove('on'); }
 $('#bPen').onclick = () => {
   if (G.busy) return;
-  const open = $('#pad').hidden; closePanels(); $('#pad').hidden = !open; $('#bPen').classList.toggle('on', open);
+  const open = $('#pad').hidden; closePanels(); $('#pad').hidden = !open; $('#bPen').classList.toggle('on', open); $('#play').classList.toggle('padopen', open); document.body.classList.toggle('padopen', open);
   if (open){ stopMic(); fitPad(); line('', '아래 칸에 손가락으로 말을 써 보세요.'); }
 };
 
