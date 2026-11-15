@@ -39,20 +39,14 @@ button:focus-visible,input:focus-visible{outline:4px solid var(--sun);outline-of
 .iconbtn{white-space:nowrap;border:2px solid var(--line);background:var(--surface);border-radius:999px;min-width:48px;height:48px;padding:0 12px;font-size:1rem;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8px}
 
-/* 마스코트 */
-.mascot{width:5rem;height:5rem;flex:none;overflow:visible}
-.mascot .m-happy,.mascot .m-oops,.mascot .m-talk,.mascot .e-happy{display:none}
-.mascot[data-mood="cheer"] .e-open{display:none}
-.mascot[data-mood="cheer"] .e-happy{display:inline}
-.mascot[data-mood="oops"] .m-smile{display:none}
-.mascot[data-mood="oops"] .m-oops{display:inline}
-.speaking .m-smile,.speaking .m-oops{display:none}
-.speaking .m-talk{display:inline;transform-box:fill-box;transform-origin:center;animation:talk .26s infinite alternate}
-@keyframes talk{from{transform:scaleY(.35)}to{transform:scaleY(1.1)}}
+/* 캐릭터(지우·세레나): 상황에 따라 그림이 바뀐다 */
+.mascot{display:block;width:5rem;height:5rem;flex:none;object-fit:contain;object-position:bottom;user-select:none;-webkit-user-drag:none}
 .mascot[data-mood="cheer"]{animation:hop .6s ease 2}
 .mascot[data-mood="oops"]{animation:wob .5s ease 1}
+.mascot.speaking{animation:bob .32s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-3px)}}
 @keyframes hop{50%{transform:translateY(-12px)}}
-@keyframes wob{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+@keyframes wob{25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
 .hero{display:flex;align-items:center;gap:12px}
 .bubble{position:relative;background:var(--surface);border:3px solid var(--line);border-radius:22px;padding:10px 16px;min-width:0;flex:1;font-size:1rem}
 .bubble::before{content:"";position:absolute;left:-12px;top:30px;width:20px;height:20px;background:var(--surface);border-left:3px solid var(--line);border-bottom:3px solid var(--line);transform:rotate(45deg)}
@@ -64,6 +58,11 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .choice .g{font-size:1.8rem;line-height:1.15}
 .choice .t{font-family:var(--font-display);font-size:1.15rem;font-weight:400}
 .choice .s{font-size:.78rem;color:var(--ink-soft);line-height:1.3}
+.choice.pc{flex-direction:row;align-items:center;gap:10px;padding:6px 12px}
+.choice.pc img{width:3.4rem;height:3.4rem;flex:none;object-fit:contain;object-position:bottom}
+.choice.pc .tx{display:flex;flex-direction:column;min-width:0}
+.choice .gi{width:2.1rem;height:2.1rem;object-fit:contain;object-position:bottom;display:block}
+.tip{margin:4px 2px 0;font-size:.86rem;color:var(--ink-soft);line-height:1.35}
 .choice[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft);box-shadow:0 4px 0 var(--primary)}
 .best{text-align:center;color:var(--ink-soft);font-size:.9rem}
 .go{display:block;margin:6px auto 0;background:var(--sun);color:var(--sun-ink);border:0;border-radius:999px;padding:12px 56px;font-family:var(--font-display);font-weight:400;font-size:1.7rem;box-shadow:0 6px 0 var(--sun-edge);transition:transform .1s,box-shadow .1s}
@@ -87,17 +86,22 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .timer.frozen{background:var(--primary-soft);border-color:var(--primary);color:var(--ink)}
 .giveup p{margin:0 0 8px}
 .giveup .row button{border:0;border-radius:999px;padding:14px 26px;font-family:var(--font-display);font-size:1.4rem}
-.stage{display:flex;align-items:center;gap:10px}
-.stage .mascot{width:4.1rem;height:4.1rem}
-.card{flex:1;min-width:0;background:var(--surface);border:3px solid var(--line);border-radius:24px;padding:10px 14px;text-align:center}
+.stage{position:relative;height:12.4rem;background:var(--primary-soft);border-radius:26px;overflow:hidden}
+.stage .mascot{position:absolute;left:.3rem;bottom:0;width:35%;height:94%;transform-origin:50% 100%}
+.stage .mascot[data-pose="point"],.stage .mascot[data-pose="cheer"]{object-fit:cover;object-position:top}
+.stage .talk{position:absolute;left:calc(35% + 1rem);right:.6rem;top:.6rem;bottom:.6rem;display:flex;flex-direction:column;gap:.4rem;min-width:0}
+.card{position:relative;flex:1;min-width:0;min-height:0;background:var(--surface);border:3px solid var(--line);border-radius:24px;padding:4px 10px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.card::before{content:"";position:absolute;left:-11px;top:calc(50% - 9px);width:18px;height:18px;background:var(--surface);border-left:3px solid var(--line);border-bottom:3px solid var(--line);transform:rotate(45deg)}
+.card .word{display:flex;align-items:center;justify-content:center;gap:.3rem;flex-wrap:wrap}
 .card .who{font-size:.8rem;color:var(--ink-soft)}
-.card .big{font-family:var(--font-display);font-weight:400;font-size:clamp(2.2rem,11vw,3.6rem);line-height:1.15;word-break:keep-all;overflow-wrap:anywhere}
-.card .pic{font-size:2.2rem;line-height:1.1;min-height:1.1em}
+.card .big{font-family:var(--font-display);font-weight:400;font-size:clamp(2rem,10vw,3.4rem);line-height:1.15;word-break:keep-all;overflow-wrap:anywhere}
+.card .big.long{font-size:clamp(1.5rem,7.4vw,2.5rem)} .card .big.xlong{font-size:clamp(1.2rem,5.6vw,1.9rem)}
+.card .pic{font-size:1.8rem;line-height:1.1} .card .pic:empty{display:none}
 .card .need{margin-top:2px;font-size:.95rem}
 .need b{display:inline-block;font-family:var(--font-display);font-weight:400;font-size:1.5rem;color:var(--primary-ink);background:var(--primary);border-radius:12px;padding:0 10px;margin:0 2px}
-.say{margin-top:8px;min-height:2.4em;background:var(--surface);border:2px dashed var(--line);border-radius:16px;padding:6px 12px;font-size:.95rem}
-.say.oops{background:var(--oops-bg);border-color:var(--oops);border-style:solid}
-.say.ok{background:var(--ok-bg);border-color:var(--ok);border-style:solid}
+.say{flex:none;min-height:2.5em;max-height:4.2em;overflow:hidden;background:var(--bg);border:2px solid transparent;border-radius:16px;padding:5px 10px;font-size:.9rem;line-height:1.35}
+.say.oops{background:var(--oops-bg);border-color:var(--oops)}
+.say.ok{background:var(--ok-bg);border-color:var(--ok)}
 .chain{display:flex;flex-wrap:wrap;gap:6px 4px;align-items:center;max-height:7.4rem;overflow:auto;padding:4px 2px}
 .w{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:0 12px;font-family:var(--font-display);font-weight:400;font-size:1.05rem;border:2px solid transparent}
 .w.bot{background:var(--primary-soft);border-color:var(--primary)}
@@ -130,6 +134,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 
 /* 결과 */
 .result{text-align:center}
+.result .mascot{width:7rem;height:8.4rem}
 .result .num{font-family:var(--font-display);font-size:3.4rem;line-height:1.1;color:var(--primary)}
 .stars{font-size:1.6rem;letter-spacing:2px;margin:4px 0}
 .result .chain{justify-content:center;max-height:11rem;margin:8px 0}
@@ -137,7 +142,13 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .confetti{position:fixed;top:-2rem;font-size:1.6rem;pointer-events:none;animation:fall 2.6s linear forwards;z-index:9}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.confetti{display:none}.mascot{animation:none!important}}
-@media (max-width:420px){.hero .bubble{font-size:.92rem}}
+@media (prefers-reduced-motion:reduce){.mascot.speaking{animation:none!important}}
+.brand{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:420px){.brand{font-size:1.2rem}}
+/* 세로 화면에서 힌트·들린 말 후보가 열리면 아래 기록과 그만하기는 잠시 숨겨 한 화면에 맞춘다(위에 정지 버튼이 있음) */
+@media (orientation:portrait){#hints:not([hidden])~.chain,#hints:not([hidden])~.quit,#heard:not([hidden])~.chain,#heard:not([hidden])~.quit{display:none}}
+@media (orientation:portrait) and (max-height:700px){.stage{height:11.4rem} #gPick .tip{display:none}}
+@media (orientation:portrait) and (min-height:900px){.stage{height:19rem} .card .big{font-size:4.4rem} .card .big.long{font-size:3.2rem} .card .pic{font-size:2.6rem}}
 
 /* 가로 화면(태블릿·폰 가로·PC): 좌우 2단으로 한 화면에 */
 .colA,.colB{display:contents}
@@ -145,7 +156,15 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
   html{font-size:clamp(13px,min(3.6vh,2.1vw),22px)}
   .app{max-width:1040px}
   #home{display:grid;grid-template-columns:1fr 1.15fr;grid-template-areas:"hero g1" "hero g2" "best go";gap:.4rem 1.2rem;align-items:center}
-  #home .hero{grid-area:hero} #home .group:nth-of-type(1){grid-area:g1} #home .group:nth-of-type(2){grid-area:g2}
+  #gPick{grid-area:hero} #gFirst{grid-area:g1} #gLevel{grid-area:g2}
+  .choice.pc{flex-direction:column;text-align:center;padding:10px 8px} .choice.pc img{width:100%;height:min(9rem,34vh)} .choice.pc .tx{align-items:center}
+  .app:has(#play:not([hidden])){height:100dvh;min-height:0}
+  #play{flex:1;min-height:0;align-items:stretch!important}
+  .colA .stage{flex:1;height:auto;min-height:9rem}
+  .stage .mascot{width:34%;height:96%} .stage .talk{left:calc(34% + 1.2rem);right:.9rem;top:.9rem;bottom:.9rem}
+  .card .big{font-size:clamp(2.4rem,5.2vw,4.6rem)} .card .big.long{font-size:clamp(1.8rem,3.9vw,3.4rem)} .card .big.xlong{font-size:clamp(1.3rem,2.9vw,2.5rem)}
+  .card .pic{font-size:2.4rem} .card .need{font-size:1.05rem} .say{font-size:1rem}
+  #play.padopen .chain{display:none}
   #home .group{margin:0!important} #home .best{grid-area:best;margin:0} #home .go{grid-area:go;margin:0 auto}
   #play{display:grid;grid-template-columns:1fr 1fr;gap:0 1.2rem;align-items:start}
   .colA,.colB{display:flex;flex-direction:column;gap:.4rem;min-width:0}
@@ -168,7 +187,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
   #play.padopen .chain,#play.padopen .quit{display:none}
   #play.padopen .tools{gap:6px}
   #play.padopen .tool{min-height:2.7rem;padding:.2rem 4px;flex-direction:row;gap:.3rem;font-size:1rem;border-radius:16px;border-width:2px} #play.padopen .tool .ic{font-size:1.25rem}
-  #play.padopen .stage .mascot{width:3.4rem;height:3.4rem} #play.padopen .card{padding:.3rem .6rem}
+  #play.padopen .stage{height:auto;background:none;overflow:visible;border-radius:0} #play.padopen .stage .talk{position:static} #play.padopen .card::before{display:none} #play.padopen .card{padding:.3rem .6rem}
   #play.padopen .card .big{font-size:clamp(1.6rem,8.5vw,2.5rem)} #play.padopen .card .pic{font-size:1.5rem;min-height:0} #play.padopen .card .need{font-size:.85rem;margin-top:0} #play.padopen .need b{font-size:1.2rem}
   #play.padopen .say{min-height:0;padding:.2rem .6rem;margin-top:0;font-size:.85rem}
   #play.padopen .entry input{padding:.35rem 12px;font-size:1.4rem;border-radius:16px} #play.padopen .ok-btn{font-size:1.3rem;border-radius:16px}
@@ -186,8 +205,32 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 @media (orientation:landscape) and (max-height:420px){
   html{font-size:clamp(10.5px,3.15vh,22px)}
   .app{padding-top:.2rem;padding-bottom:.3rem;gap:.3rem} .iconbtn{min-width:38px;height:38px}
-  #home .hero .mascot{width:3.4rem;height:3.4rem} .go{padding-top:.4rem;padding-bottom:.4rem}
+  .choice.pc img{height:min(6rem,30vh)} .go{padding-top:.4rem;padding-bottom:.4rem} .tip{display:none}
 }
+/* 세로 화면도 한 화면에 꽉 차게: 캐릭터 무대가 남는 높이만큼 늘어나고, 좁으면 먼저 줄어든다 */
+.stage{container-type:size}
+.stage .mascot[data-pose="point"],.stage .mascot[data-pose="cheer"]{height:min(94cqh,59.5cqw)}
+@media (orientation:landscape) and (min-width:700px){.stage .mascot[data-pose="point"],.stage .mascot[data-pose="cheer"]{height:min(96cqh,57.8cqw)}}
+@media (orientation:portrait){
+  #home,#result{flex:1;display:flex;flex-direction:column;justify-content:space-evenly}
+  #home .group{margin:0!important} #result{align-items:center} #result .chain{align-self:stretch}
+  #play{flex:1;min-height:0;display:flex;flex-direction:column;gap:.45rem}
+  #play>.colA>*,#play>.colB>*{flex:none}
+  #play:not(.padopen) .stage{flex:1 1 8.4rem;height:auto;min-height:8.4rem;margin-top:0!important}
+  #play .tools,#play .hints,#play .chain,#play .pad{margin-top:0!important}
+  #play .quit{align-self:center}
+}
+#play.padopen .stage{container-type:normal}
+.card{overflow:hidden} .card::before{z-index:1}
+@container (max-height:12.5rem){.card .who{display:none} .card .need{font-size:.82rem;margin-top:0;line-height:1.3} .need b{font-size:1.2rem} .card .big{font-size:clamp(1.7rem,8.4vw,2.6rem)} .card .pic{font-size:1.4rem}}
+@container (max-height:10.5rem){.card .need small{display:none} .card .need{font-size:.74rem;white-space:nowrap} .card .big{font-size:clamp(1.5rem,7.4vw,2.2rem)} .card{padding:2px 6px} .say{min-height:0;max-height:2.9em;font-size:.84rem;padding:3px 8px}}
+/* 낮은 세로 화면에서 힌트·들린 말 후보가 열린 동안만 도구 버튼을 한 줄로 낮춘다 */
+@media (orientation:portrait) and (max-height:760px){
+  #play:has(#hints:not([hidden])) .tool,#play:has(#heard:not([hidden])) .tool{min-height:2.9rem;padding:.2rem 4px;flex-direction:row;gap:.3rem;font-size:1.05rem;border-radius:16px}
+  .hints{gap:6px} .hint{min-height:2.75rem;padding:5px 14px;font-size:1.3rem;border-radius:16px}
+  #play:has(#hints:not([hidden])) .tool .ic,#play:has(#heard:not([hidden])) .tool .ic{font-size:1.3rem}
+}
+@media (orientation:portrait) and (min-height:900px){.choice.pc img{width:6rem;height:6rem} .result .mascot{width:11rem;height:14rem}}
 /* AIEDU 허브로 가는 아이콘 — 모든 서비스 공통 모양·위치: 페이지 왼쪽 위(body 첫 요소). 앱마다 이 자리를 비워 둔다 */
 .aiedu-home{position:absolute;left:max(8px,env(safe-area-inset-left,0px));top:max(8px,env(safe-area-inset-top,0px));z-index:1000;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:linear-gradient(160deg,#ffe58f,#ffb08e);border:2px solid #fff;box-shadow:0 2px 0 rgba(74,52,38,.22);text-decoration:none;-webkit-tap-highlight-color:transparent}
 .aiedu-home svg{width:30px;height:30px;display:block}
@@ -208,19 +251,6 @@ a.addEventListener('pointercancel',function(){bad=true},{passive:true});
 a.addEventListener('click',function(e){if(bad||Date.now()-born<1000){e.preventDefault();bad=false}});
 a.draggable=false;})();
 </script>
-<template id="mascotTpl">
-<svg class="mascot" data-mood="happy" viewBox="0 0 120 120" aria-hidden="true">
-  <ellipse cx="60" cy="112" rx="34" ry="5" fill="#000" opacity=".12"/>
-  <path d="M60 10c-6 0-9 6-8 11 4 2 12 2 16 0 1-5-2-11-8-11z" fill="#8BCB5A" stroke="#4E8F2A" stroke-width="3" stroke-linejoin="round"/>
-  <circle cx="60" cy="64" r="48" fill="#FFC83D" stroke="#D99A00" stroke-width="4"/>
-  <ellipse cx="38" cy="78" rx="9" ry="6" fill="#FF8FA3" opacity=".7"/><ellipse cx="82" cy="78" rx="9" ry="6" fill="#FF8FA3" opacity=".7"/>
-  <g class="e-open" fill="#33260A"><circle cx="45" cy="60" r="6.5"/><circle cx="75" cy="60" r="6.5"/><circle cx="47" cy="58" r="2.2" fill="#fff"/><circle cx="77" cy="58" r="2.2" fill="#fff"/></g>
-  <g class="e-happy" fill="none" stroke="#33260A" stroke-width="5" stroke-linecap="round"><path d="M38 62q7-10 14 0"/><path d="M68 62q7-10 14 0"/></g>
-  <path class="m-smile" d="M48 80q12 12 24 0" fill="none" stroke="#33260A" stroke-width="5" stroke-linecap="round"/>
-  <path class="m-oops" d="M50 88q10-9 20 0" fill="none" stroke="#33260A" stroke-width="5" stroke-linecap="round"/>
-  <ellipse class="m-talk" cx="60" cy="84" rx="9" ry="8" fill="#7A2E1D"/>
-</svg>
-</template>
 
 <div class="app">
   <header class="top">
@@ -233,13 +263,18 @@ a.draggable=false;})();
 
   <!-- 홈 -->
   <section id="home">
-    <div class="hero"><span class="mascot-slot"></span><div class="bubble">안녕! 나는 <b>말랑이</b>야.<br>우리 같이 끝말잇기 하자! 앞 말의 <b>끝 글자</b>로 시작하는 말을 해 보는 거야.</div></div>
-    <div class="group" style="margin-top:14px"><h2>누가 먼저 할까요?</h2>
+    <div class="group" id="gPick"><h2>누구랑 할까요?</h2>
+      <div class="choices" id="charChoices">
+        <button class="choice pc" data-v="jiwoo" aria-pressed="true"><img src="img/jiwoo_happy.webp" alt="" width="240" height="287"><span class="tx"><span class="t">지우</span><span class="s">안녕! 나는 지우야</span></span></button>
+        <button class="choice pc" data-v="serena" aria-pressed="false"><img src="img/serena_happy.webp" alt="" width="280" height="287"><span class="tx"><span class="t">세레나</span><span class="s">안녕! 나는 세레나야</span></span></button>
+      </div>
+      <p class="tip">앞 말의 <b>끝 글자</b>로 시작하는 말을 이어 가는 놀이예요.</p></div>
+    <div class="group" id="gFirst"><h2>누가 먼저 할까요?</h2>
       <div class="choices" id="firstChoices">
-        <button class="choice" data-v="bot" aria-pressed="true"><span class="g">🤖</span><span class="t">말랑이 먼저</span><span class="s">내가 먼저 말할게</span></button>
+        <button class="choice" data-v="bot" aria-pressed="true"><img class="gi" id="firstFace" src="img/jiwoo_happy.webp" alt=""><span class="t" id="firstName">지우 먼저</span><span class="s">내가 먼저 말할게</span></button>
         <button class="choice" data-v="kid" aria-pressed="false"><span class="g">🙋</span><span class="t">내가 먼저</span><span class="s">아무 말이나 괜찮아</span></button>
       </div></div>
-    <div class="group"><h2>단계를 골라요</h2>
+    <div class="group" id="gLevel"><h2>단계를 골라요</h2>
       <div class="choices" id="levelChoices">
         <button class="choice" data-v="easy" aria-pressed="true"><span class="g">🌱</span><span class="t">쉬워요</span><span class="s">쉬운 말로 이어 줘요 · 힌트 마음껏</span></button>
         <button class="choice" data-v="hard" aria-pressed="false"><span class="g">🔥</span><span class="t">도전!</span><span class="s">이어 가기 어려운 말도 내요 · 힌트 3번</span></button>
@@ -253,8 +288,11 @@ a.draggable=false;})();
    <div class="colA">
     <div class="stats"><span class="score" id="score">말 0</span><span class="score" id="stars">⭐ 0</span><span class="score timer" id="timer">⏱ 20</span><span class="sp"></span><button class="iconbtn" id="btnPause" aria-label="잠깐 멈추기">⏸ 중지</button><button class="iconbtn" id="btnQuitTop" aria-label="정지(끝내기)">⏹ 정지</button></div>
     <div class="tbar" id="tbar" aria-hidden="true"><i id="tfill"></i></div>
-    <div class="stage" style="margin-top:10px"><span class="mascot-slot" id="stageMascot"></span>
-      <div class="card"><div class="who" id="who"></div><div class="big" id="big">…</div><div class="pic" id="pic"></div><div class="need" id="need"></div></div>
+    <div class="stage" style="margin-top:8px"><span class="mascot-slot" id="stageMascot"></span>
+      <div class="talk">
+        <div class="card"><div class="who" id="who"></div><div class="word"><span class="big" id="big">…</span><span class="pic" id="pic"></span></div><div class="need" id="need"></div></div>
+        <div class="say" id="say" role="status" aria-live="polite"></div>
+      </div>
     </div>
     <div class="giveup pausebox" id="pausebox" hidden style="margin-top:10px">
       <p>⏸ 잠깐 멈췄어요. 준비되면 계속해요!</p>
@@ -264,8 +302,6 @@ a.draggable=false;})();
       <p>처음부터 다시해볼까? 아니면 그만할까?<br>그만하고 싶으면 정지 버튼을 눌러줘.</p>
       <div class="row"><button id="btnRestart" style="background:var(--sun);color:var(--sun-ink)">🔄 처음부터</button><button id="btnStop" style="background:var(--oops);color:#fff">⏹ 정지</button></div>
     </div>
-    <div class="say" id="say" role="status" aria-live="polite"></div>
-    <div class="chain" id="chain" aria-label="지금까지 이은 말"></div>
    </div>
    <div class="colB">
     <form class="entry" id="entry" autocomplete="off">
@@ -284,6 +320,7 @@ a.draggable=false;})();
     </div>
     <div class="hints" id="hints" hidden style="margin-top:8px"></div>
     <div class="hints" id="heard" hidden style="margin-top:8px"></div>
+    <div class="chain" id="chain" aria-label="지금까지 이은 말" style="margin-top:6px"></div>
     <button class="quit" id="btnQuit">그만하기</button>
    </div>
   </section>
@@ -449,11 +486,28 @@ function speak(text, done){
   }catch(e){ setTimeout(end, 300); }
 }
 function setSpeaking(on){ mascots.forEach(m => m.classList.toggle('speaking', on)); }
-function mood(m){ mascots.forEach(x => x.dataset.mood = m); }
+/* 캐릭터: 기분(mood)마다 보여 줄 그림(pose). happy=손가락 들고 말하기, cheer=만세, oops·stuck=머쓱, think=생각 중 */
+const CHARS = { jiwoo: '지우', serena: '세레나' };
+const POSE = { happy: 'point', cheer: 'cheer', oops: 'scratch', stuck: 'scratch', think: 'think' };
+let charId = CHARS[store.get('wc-char', '')] ? store.get('wc-char', '') : 'jiwoo', curMood = 'happy';
+const charName = () => CHARS[charId];
+const charImg = (pose) => `img/${charId}_${pose}.webp`;
+function mood(m){ curMood = m; const pose = POSE[m] || 'point'; mascots.forEach(x => { x.dataset.mood = m; x.dataset.pose = pose; const u = charImg(pose); if (x.getAttribute('src') !== u) x.src = u; }); }
+function setChar(id){
+  charId = CHARS[id] ? id : 'jiwoo'; store.set('wc-char', charId);
+  document.querySelectorAll('#charChoices .choice').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === charId)));
+  $('#firstFace').src = charImg('happy'); $('#firstName').textContent = charName() + ' 먼저';
+  mascots.forEach(x => x.alt = charName());
+  ['point', 'cheer', 'scratch', 'think'].forEach(p => { new Image().src = charImg(p); });   // 미리 받아 두어 표정이 바로 바뀌게
+  mood(curMood);
+}
+function setBig(t){ const b = $('#big'), n = [...String(t)].length; b.textContent = t; b.classList.toggle('long', n === 4 || n === 5); b.classList.toggle('xlong', n > 5); }
 function setSoundUI(){ $('#btnSound').textContent = soundOn ? '🔊' : '🔇'; }
 $('#btnSound').onclick = () => { soundOn = !soundOn; store.set('wc-sound', soundOn ? '1' : '0'); if (!soundOn){ try{ speechSynthesis.cancel(); }catch(e){} setSpeaking(false); } setSoundUI(); };
 setSoundUI();
-document.querySelectorAll('.mascot-slot').forEach(s => { const n = document.getElementById('mascotTpl').content.firstElementChild.cloneNode(true); s.replaceWith(n); n.id = s.id || ''; mascots.push(n); });
+document.querySelectorAll('.mascot-slot').forEach(s => { const n = new Image(); n.className = 'mascot'; n.draggable = false; n.id = s.id || ''; s.replaceWith(n); mascots.push(n); });
+document.querySelectorAll('#charChoices .choice').forEach(b => b.onclick = () => setChar(b.dataset.v));
+setChar(charId);
 
 /* ───────── 화면 ───────── */
 const views = { home: $('#home'), play: $('#play'), result: $('#result') };
@@ -510,12 +564,12 @@ function startGame(){
   show('play'); closePanels(); stopTimer(); frozen = false; G.paused = false; $('#pausebox').hidden = true; $('#giveup').hidden = true; paintTimer(LIMIT); updateStats();
   $('#inp').value = ''; $('#chain').innerHTML = ''; $('#pic').textContent = ''; mood('happy');
   if (opts.first === 'bot'){
-    $('#who').textContent = ''; $('#big').textContent = '…';
+    $('#who').textContent = ''; setBig('…'); mood('think');
     line('', '내가 먼저 할게!');
     setBusy(true);
     setTimeout(() => botTurn(null, '내가 먼저 할게!'), 500);
   } else {
-    $('#who').textContent = '내 차례'; $('#big').textContent = '?'; showNeed();
+    $('#who').textContent = '내 차례'; setBig('?'); showNeed();
     line('', '먼저 아무 말이나 해 봐! 두 글자 이상이면 좋아요.');
     speak('먼저 아무 말이나 해 봐!', () => { if (!G.over) turnStart(); }); setBusy(false);
   }
@@ -601,7 +655,7 @@ function submit(raw, fromHint){
   G.kidCount++;
   if (!fromHint) G.stars++;
   $('#inp').value = ''; clearPad(); closePanels();
-  $('#who').textContent = '내가 한 말'; $('#big').textContent = word; $('#pic').textContent = emojiOf(word);
+  $('#who').textContent = '내가 한 말'; setBig(word); $('#pic').textContent = emojiOf(word);
   renderChain($('#chain'), true); updateStats();
   mood('cheer'); beep([523, 659, 784]);
   const praise = rnd(['좋아, 잘했어!', '맞아 맞아!', '우와, 멋져!', '정답이야!', '그렇지!']);
@@ -609,10 +663,10 @@ function submit(raw, fromHint){
   line('ok', note);
   G.req = startsFor(last(word));
   setBusy(true);
-  speak(word, () => setTimeout(() => botTurn(word, note), 250));
+  speak(word, () => setTimeout(() => { if (!G.over) mood('think'); setTimeout(() => botTurn(word, note), 700); }, 500));   // 캐릭터가 잠깐 생각하는 모습
 }
 
-/* 말랑이 차례 */
+/* 캐릭터 차례 */
 function pickBot(req){
   const ok = (w) => !G.used.has(w);
   let pool = [];
@@ -647,7 +701,7 @@ function botTurn(prev, lead){
   G.used.add(w);
   G.chain.push({ who: 'bot', word: w, emoji: emojiOf(w) });
   G.req = startsFor(last(w));
-  $('#who').textContent = '말랑이의 말'; $('#big').textContent = w; $('#pic').textContent = emojiOf(w);
+  $('#who').textContent = charName() + '의 말'; setBig(w); $('#pic').textContent = emojiOf(w);
   renderChain($('#chain'), true); showNeed();
   mood('happy');
   line('', prev ? `${lead}  나는 ‘${w}’!` : `나는 ‘${w}’! 이제 네 차례야.`);
@@ -667,14 +721,14 @@ function finish(kidWins){
   if (newBest) store.set('wc-best', String(n));
   showBest();
   if (kidWins){
-    mood('cheer'); beep([523, 659, 784, 1047]);
+    mood('stuck'); beep([523, 659, 784, 1047]);
     line('ok', '으앗, 이어 갈 말이 생각 안 나! 내가 졌어. 너 정말 대단해!');
     speak('내가 졌어! 너 정말 대단해!', () => setTimeout(showResult, 400, kidWins, newBest));
   } else setTimeout(showResult, 100, kidWins, newBest);
 }
 function showResult(kidWins, newBest){
   show('result');
-  $('#resTitle').textContent = kidWins ? '🎉 말랑이가 졌어요!' : '수고했어요!';
+  $('#resTitle').textContent = kidWins ? `🎉 ${charName()}가 졌어요!` : '수고했어요!';
   $('#resNum').textContent = `${G.kidCount}개`;
   $('#resStars').textContent = G.stars ? '⭐'.repeat(Math.min(G.stars, 10)) + (G.stars > 10 ? ` ×${G.stars}` : '') : '';
   const n = G.kidCount;

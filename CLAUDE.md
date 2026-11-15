@@ -1,11 +1,13 @@
 # 끝말잇기 놀이터 (word)
 
-캐릭터 '말랑이'와 하는 끝말잇기. 말랑이 먼저/내가 먼저, 쉬워요/도전! 모드.
+캐릭터 '지우'·'세레나' 중 짝꿍을 골라 대화하듯 하는 끝말잇기. 캐릭터 먼저/내가 먼저, 쉬워요/도전! 모드.
+
+- **`index.html` = 캐릭터 버전(기본)**, **`a.html` = 예전 '말랑이' 원본(보관용, 고치지 않는다)**. 캐릭터 그림은 `img/<jiwoo|serena>_<point|cheer|think|scratch|happy>.webp` — 배포에 포함돼야 한다. `mood()` 가 기분(happy·cheer·oops·stuck·think)에 맞는 그림으로 바꾼다. 무대(`.stage`)는 남는 높이를 채우고 좁으면 먼저 줄어든다(`container-type:size`).
 
 ## 구조
 - `index.html`(약 61KB), 보조 사전 `extra.txt`(약 5.2만 낱말, 없어도 동작), 사전 생성 `build-extra.mjs`+`source/`(hunspell-ko 라이선스 `source/LICENSE-hunspell-ko.txt`), `vercel.json`(허브에서는 미사용). 허브 `exclude`: `source`·`build-extra.mjs`·`vercel.json` — **`extra.txt` 는 배포에 포함**돼야 한다.
 - 입력: 키보드 / 🎙️ 말하기(Web Speech, 자모 거리로 비슷한 낱말 보정·"혹시 이 말?" 후보) / ✍️ 쓰기(구글 입력도구 비공식 필기 인식) / 💡 힌트. "모르겠어·몰라·도와줘" 라고 하면 이어갈 낱말 3개를 추천하고 말로도 읽어 준다.
-- 규칙: 두음법칙(`startsFor`), 사전에 없는 말도 첫 글자만 맞으면 격려하며 받음, 말랑이가 이을 말이 없으면 아이 승리. 쉬운 낱말 약 1,100개는 `<script id="kidWords">`(낱말 뒤 이모지).
+- 규칙: 두음법칙(`startsFor`), 사전에 없는 말도 첫 글자만 맞으면 격려하며 받음, 캐릭터가 이을 말이 없으면 아이 승리. 쉬운 낱말 약 1,100개는 `<script id="kidWords">`(낱말 뒤 이모지).
 - 구조: `.app > header.top / #home / #play(.colA 문제·대화, .colB 입력·도구·필기판) / #result`. 화면 맞춤: `html{font-size:clamp(13px,min(2.95vh,4.9vw),22px)}`, 가로 화면은 2단, ≤420px 높이는 글자 최소 10.5px. 세로 폰에서 필기판을 연 상태만 스크롤이 생기는 것이 허용 범위.
 - 테스트: 로컬 서버로 열고 `#btnGo` → `#inp` 입력 → `.ok-btn`, "모르겠어" 입력 시 `#hints button` 3개, `#bPen` 필기판. 이 앱은 `word` 전용 세션에서도 기능이 추가되므로 push 전 fetch·rebase.
 
