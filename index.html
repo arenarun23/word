@@ -232,7 +232,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 }
 @media (orientation:portrait) and (min-height:900px){.choice.pc img{width:6rem;height:6rem} .result .mascot{width:11rem;height:14rem}}
 /* 목소리 고르기(세계 국기 놀이와 같은 방식): 기기에 있는 한국어 목소리 중에서 고른다 */
-.vsheet{position:fixed;inset:0;z-index:50;background:rgba(40,30,10,.45);display:flex;align-items:center;justify-content:center;padding:12px}
+.vsheet{position:fixed;inset:0;z-index:1100;background:rgba(40,30,10,.45);display:flex;align-items:center;justify-content:center;padding:12px}
 .vsheet[hidden]{display:none}
 .vbox{background:var(--bg);color:var(--ink);border-radius:26px;width:min(34rem,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.3)}
 .vbox header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 10px 18px;font-family:var(--font-display);font-size:1.35rem}
@@ -243,6 +243,16 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 .vbtn.sel{border-color:var(--primary);background:var(--primary-soft)}
 .vhelp{font-size:.85rem;line-height:1.5;color:var(--ink-soft);background:var(--surface);border-radius:16px;padding:10px 12px}
 .vhelp b{color:var(--ink)}
+.iconbtn.vwarn{border-color:var(--oops);background:var(--oops-bg);color:var(--ink);font-family:var(--font-display);font-size:.95rem;animation:pulse .8s ease 5}
+.vwarn[hidden]{display:none}
+@media (max-width:420px){.vwarn .w1{display:none}}
+.iconbtn.warn{border-color:var(--oops);box-shadow:inset 0 0 0 2px var(--oops)}
+.vguide{font-size:.95rem;line-height:1.5;background:var(--surface);border-radius:16px;padding:10px 12px}
+.vguide.big{font-size:1.05rem;border:3px solid var(--oops)}
+.vguide h3{margin:0 0 4px;font-family:var(--font-display);font-weight:400;font-size:1.15rem}
+.vguide ol{margin:0;padding-left:1.4em} .vguide li{margin:.25em 0} .vguide small{display:block;color:var(--ink-soft);margin-top:.4em}
+.vrow{display:flex;flex-wrap:wrap;gap:8px} .vrow .vbtn{flex:1 1 9rem;text-align:center;align-items:center}
+.vmsg{font-size:.92rem;min-height:1.4em} .vmsg.ok{color:var(--ok)} .vmsg.bad{color:var(--oops)}
 /* AIEDU 허브로 가는 아이콘 — 모든 서비스 공통 모양·위치: 페이지 왼쪽 위(body 첫 요소). 앱마다 이 자리를 비워 둔다 */
 .aiedu-home{position:absolute;left:max(8px,env(safe-area-inset-left,0px));top:max(8px,env(safe-area-inset-top,0px));z-index:1000;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:linear-gradient(160deg,#ffe58f,#ffb08e);border:2px solid #fff;box-shadow:0 2px 0 rgba(74,52,38,.22);text-decoration:none;-webkit-tap-highlight-color:transparent}
 .aiedu-home svg{width:30px;height:30px;display:block}
@@ -275,6 +285,7 @@ a.draggable=false;})();
     <h1 class="brand">🔗 끝말잇기 놀이터</h1>
     <div style="display:flex;gap:6px">
       <button class="iconbtn" id="btnSound" aria-label="소리 켜기/끄기">🔊</button>
+      <button class="iconbtn vwarn" id="vWarn" aria-label="읽어 주는 목소리가 준비되지 않았어요. 눌러서 확인해요" hidden>🔇 <span class="w1">목소리&nbsp;</span>확인</button>
       <button class="iconbtn" id="btnVoice" aria-label="목소리 고르기">🗣️</button>
       <button class="iconbtn" id="btnHome" aria-label="처음으로" hidden>🏠</button>
     </div>
@@ -508,14 +519,35 @@ function pickVoice(){
   const saved = store.get('wc-voice', '');
   return (saved && list.find(v => vkey(v) === saved)) || null;   // 고르지 않았으면 기기 기본 목소리(세계 국기 놀이와 같음)
 }
-function sampleVoice(v){   // 고른 목소리로 바로 들려준다(소리 끄기와 상관없이, 직접 누른 것이므로)
-  if (!synth) return;
+/* 읽어 주기가 실제로 되는지: 소리가 시작되면 ok, 오류가 나거나 아무 반응이 없으면 bad.
+   안 되는 기기에서는 알림을 띄우고(누르면 목소리 창), 놀이는 글자만으로 기다림 없이 이어진다. */
+let ttsOk = false, ttsBad = 0;
+const ttsBroken = () => !synth || (!ttsOk && ttsBad > 0);
+function ttsWarn(){
+  if (ttsOk || store.get('wc-ttsok', '') === '1') return false;
+  const noKo = allVoices.length > 0 && !koVoices().length;     // 목록이 아예 비어 있는 기기는 정상일 수도 있어 읽어 본 뒤에 판단
+  return !synth || noKo || ttsBad > 0;
+}
+function ttsState(){   // 알림은 시작 화면 위쪽 단추 자리에(화면 높이를 쓰지 않게), 놀이 중에는 소리 단추 테두리로만 알린다
+  const w = soundOn && ttsWarn(), home = !$('#home').hidden;
+  $('#vWarn').hidden = !(w && home); $('#btnVoice').hidden = !home || w; $('#btnSound').classList.toggle('warn', w);
+}
+function ttsGood(){ if (!ttsOk){ ttsOk = true; ttsState(); } }
+function ttsFail(){ ttsBad++; ttsState(); }
+function sampleVoice(v, report){   // 고른 목소리로 바로 들려준다(소리 끄기와 상관없이, 직접 누른 것이므로)
+  if (!synth){ report && report(false); return; }
   try{
     synth.cancel();
     const u = new SpeechSynthesisUtterance(`안녕! 나는 ${charName()}야. 같이 끝말잇기 하자!`);
     u.lang = 'ko-KR'; u.rate = .9; if (v) u.voice = v;
+    let got = false; const t0 = Date.now();
+    const fin = (ok) => { if (got) return; got = true; ok ? ttsGood() : ttsFail(); report && report(ok); };
+    u.onstart = () => fin(true);
+    u.onend = () => fin(Date.now() - t0 > 250);
+    u.onerror = (e) => { const k = e && e.error; if (k !== 'interrupted' && k !== 'canceled') fin(false); };
     synth.speak(u);
-  }catch(e){}
+    setTimeout(() => fin(false), 3500);
+  }catch(e){ report && report(false); }
 }
 function renderVoices(){
   loadVoices();
@@ -523,7 +555,23 @@ function renderVoices(){
   const add = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; box.appendChild(n); return n; };
   const list = koVoices().slice().sort((a, b) => vscore(b) - vscore(a));
   const saved = store.get('wc-voice', ''), chosen = saved && list.find(v => vkey(v) === saved);
-  if (!synth){ add('div', 'vhelp', '이 브라우저는 말로 읽어 주기가 안 돼요. 크롬이나 삼성 인터넷으로 열어 주세요.'); return; }
+  const warn = ttsWarn();
+  const guide = () => {
+    const g = add('div', 'vguide' + (warn ? ' big' : ''));
+    g.innerHTML = '<h3>' + (warn ? '🔇 목소리가 준비되지 않았어요' : '목소리가 이상하거나 목록이 없으면?') + '</h3>'
+      + '<ol><li>기기의 <b>설정</b> 앱을 열어요.</li><li><b>일반 → 언어 → 텍스트 음성 변환</b>으로 들어가요.</li>'
+      + '<li><b>기본 엔진</b>을 <b>Samsung 텍스트 음성 변환</b>(없으면 Google 음성 서비스)으로 골라요.</li>'
+      + '<li>언어를 <b>한국어</b>로 하고, 한국어 <b>음성 데이터</b>를 내려받아요.</li>'
+      + '<li>이 화면으로 돌아와 아래 <b>들어 보기</b>를 눌러요.</li></ol>'
+      + '<small>메뉴 이름은 기기마다 조금 달라요. 설정에서 “텍스트 음성 변환”을 검색해도 돼요. 웹페이지에서는 설정 창을 대신 열 수 없어요.</small>';
+    const row = add('div', 'vrow');
+    const t = document.createElement('button'); t.className = 'vbtn'; t.id = 'vTest'; t.textContent = '🔊 들어 보기'; row.appendChild(t);
+    if (warn){ const k = document.createElement('button'); k.className = 'vbtn'; k.id = 'vOk'; k.textContent = '👍 잘 들려요'; row.appendChild(k); }
+    const m = add('div', 'vmsg'); m.id = 'vMsg'; m.setAttribute('role', 'status');
+    if (warn) m.textContent = '소리가 안 나와도 글자만으로 끝말잇기를 할 수 있어요.';
+  };
+  if (!synth){ add('div', 'vguide big', '이 브라우저는 말로 읽어 주기가 안 돼요. 크롬이나 삼성 인터넷으로 열어 주세요. 소리가 없어도 글자만으로 놀이는 할 수 있어요.'); return; }
+  if (warn) guide();
   add('div', 'vnow', chosen ? `지금 목소리: ${chosen.name}` : '지금 목소리: 기기 기본 목소리');
   const d = add('button', 'vbtn' + (chosen ? '' : ' sel')); d.dataset.k = '';
   d.appendChild(document.createTextNode('기기 기본 목소리')); d.appendChild(Object.assign(document.createElement('small'), { textContent: '따로 고르지 않고 기기가 정한 목소리로 읽어요' }));
@@ -533,15 +581,14 @@ function renderVoices(){
     b.appendChild(Object.assign(document.createElement('small'), { textContent: v.lang + (v.localService ? ' · 기기 안 목소리' : ' · 인터넷 목소리') }));
   });
   if (!list.length) add('div', 'vnow', '이 기기에서 한국어 목소리 목록을 찾지 못했어요. 그래도 기기 기본 목소리로 읽어 줄 수 있어요.');
-  const h = add('div', 'vhelp');
-  h.innerHTML = '<b>목소리가 이상하거나 목록이 없으면?</b><br>갤럭시: 설정 → 일반 → 언어 → <b>텍스트 음성 변환</b>에서 기본 엔진과 한국어 음성을 내려받아 고른 뒤, 이 화면을 다시 열어 주세요.';
+  if (!warn) guide();
 }
 function openVoices(){ renderVoices(); $('#voiceSheet').hidden = false; }
 function closeVoices(){ $('#voiceSheet').hidden = true; try{ synth && synth.cancel(); }catch(e){} }
 if (synth){
   loadVoices();
-  try{ synth.addEventListener('voiceschanged', () => { loadVoices(); if (!$('#voiceSheet').hidden) renderVoices(); }); }catch(e){}
-  let vtry = 0; const vpoll = setInterval(() => { loadVoices(); if (allVoices.length || ++vtry > 20){ clearInterval(vpoll); if (!$('#voiceSheet').hidden) renderVoices(); } }, 500);   // 안드로이드는 목록이 늦게 온다
+  try{ synth.addEventListener('voiceschanged', () => { loadVoices(); ttsState(); if (!$('#voiceSheet').hidden) renderVoices(); }); }catch(e){}
+  let vtry = 0; const vpoll = setInterval(() => { loadVoices(); if (allVoices.length || ++vtry > 20){ clearInterval(vpoll); ttsState(); if (!$('#voiceSheet').hidden) renderVoices(); } }, 500);   // 안드로이드는 목록이 늦게 온다
 }
 let speakId = 0;
 function speak(text, done){
@@ -553,9 +600,13 @@ function speak(text, done){
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ko-KR'; u.rate = .9;
     const v = pickVoice(); if (v) u.voice = v;
-    u.onstart = () => setSpeaking(true); u.onend = end; u.onerror = end;
+    let started = false; const t0 = Date.now();
+    u.onstart = () => { started = true; ttsGood(); setSpeaking(true); };
+    u.onend = () => { if (!started && Date.now() - t0 > 250){ started = true; ttsGood(); } end(); };
+    u.onerror = (e) => { const k = e && e.error; if (!started && k !== 'interrupted' && k !== 'canceled'){ started = true; ttsFail(); } end(); };
+    const wait = ttsBroken() ? 700 : Math.min(6000, 1500 + text.length * 250);   // 목소리가 안 되는 기기에서는 오래 기다리지 않는다
     speechSynthesis.speak(u);
-    setTimeout(end, Math.min(6000, 1500 + text.length * 250));   // 소리가 안 끝나도 게임이 멈추지 않게
+    setTimeout(() => { if (!started && !fin && id === speakId) ttsFail(); end(); }, wait);   // 소리가 안 끝나도 게임이 멈추지 않게
   }catch(e){ setTimeout(end, 300); }
 }
 function setSpeaking(on){ mascots.forEach(m => m.classList.toggle('speaking', on)); }
@@ -576,8 +627,8 @@ function setChar(id){
 }
 function setBig(t){ const b = $('#big'), n = [...String(t)].length; b.textContent = t; b.classList.toggle('long', n === 4 || n === 5); b.classList.toggle('xlong', n > 5); }
 function setSoundUI(){ $('#btnSound').textContent = soundOn ? '🔊' : '🔇'; }
-$('#btnSound').onclick = () => { soundOn = !soundOn; store.set('wc-sound', soundOn ? '1' : '0'); if (!soundOn){ try{ speechSynthesis.cancel(); }catch(e){} setSpeaking(false); } setSoundUI(); };
-setSoundUI();
+$('#btnSound').onclick = () => { soundOn = !soundOn; store.set('wc-sound', soundOn ? '1' : '0'); if (!soundOn){ try{ speechSynthesis.cancel(); }catch(e){} setSpeaking(false); } setSoundUI(); ttsState(); };
+setSoundUI(); ttsState();
 document.querySelectorAll('.mascot-slot').forEach(s => { const n = new Image(); n.className = 'mascot'; n.draggable = false; n.id = s.id || ''; s.replaceWith(n); mascots.push(n); });
 document.querySelectorAll('#charChoices .choice').forEach(b => b.onclick = () => setChar(b.dataset.v));
 setChar(charId);
@@ -586,7 +637,7 @@ setChar(charId);
 const views = { home: $('#home'), play: $('#play'), result: $('#result') };
 function show(v){
   for (const k in views) views[k].hidden = k !== v;
-  $('#btnHome').hidden = v === 'home'; $('#btnVoice').hidden = v !== 'home';
+  $('#btnHome').hidden = v === 'home'; ttsState();
   if (v !== 'play') { stopTimer(); G.paused = false; $('#pausebox').hidden = true; stopMic(); try{ speechSynthesis.cancel(); }catch(e){} setSpeaking(false); }
   window.scrollTo(0, 0);
 }
@@ -1023,10 +1074,23 @@ $('#btnGo').onclick = startGame;
 $('#btnAgain').onclick = startGame;
 $('#btnHome').onclick = () => { G.over = true; show('home'); };
 $('#btnVoice').onclick = openVoices;
+$('#vWarn').onclick = openVoices;
+document.addEventListener('visibilitychange', () => { if (!document.hidden){ loadVoices(); ttsState(); if (!$('#voiceSheet').hidden) renderVoices(); } });   // 설정을 바꾸고 돌아오면 다시 확인
 $('#closeVoice').onclick = closeVoices;
 $('#voiceSheet').onclick = (e) => { if (e.target.id === 'voiceSheet') closeVoices(); };
 $('#vlist').onclick = (e) => {
   const b = e.target.closest('.vbtn'); if (!b) return;
+  if (b.id === 'vOk'){ store.set('wc-ttsok', '1'); ttsState(); renderVoices(); return; }
+  if (b.id === 'vTest'){
+    const m = $('#vMsg'); m.className = 'vmsg'; m.textContent = '들려주는 중…';
+    sampleVoice(pickVoice(), (ok) => {
+      if (ok) renderVoices();
+      const m2 = $('#vMsg'); if (!m2) return;
+      m2.className = 'vmsg ' + (ok ? 'ok' : 'bad');
+      m2.textContent = ok ? '소리가 나오고 있어요. 잘 들리면 준비 끝!' : '아직 소리가 안 나와요. 위 순서대로 설정한 뒤 다시 눌러 주세요.';
+    });
+    return;
+  }
   store.set('wc-voice', b.dataset.k);
   renderVoices(); sampleVoice(pickVoice());
   window.aieduLog && aieduLog('use', 'voice');   // 어떤 목소리인지는 기록하지 않는다
