@@ -4,6 +4,8 @@
 
 - **`index.html` = 캐릭터 버전(기본)**, **`a.html` = 예전 '말랑이' 원본(보관용, 고치지 않는다)**. 캐릭터 그림은 `img/<jiwoo|serena>_<point|cheer|think|scratch|happy>.webp` — 배포에 포함돼야 한다. `mood()` 가 기분(happy·cheer·oops·stuck·think)에 맞는 그림으로 바꾼다. 무대(`.stage`)는 남는 높이를 채우고 좁으면 먼저 줄어든다(`container-type:size`).
 
+- **목소리 고르기**: 시작 화면 오른쪽 위 🗣️(`#btnVoice`, 놀이 중에는 숨김) → `#voiceSheet` 에서 기기의 한국어 목소리를 고른다(세계 국기 `flagmap` 과 같은 방식). 선택은 `localStorage` `wc-voice`(voiceURI), 고르지 않으면 기기 기본 목소리. 목소리 이름은 `textContent` 로만 넣고 이용 기록에는 `use/voice` 태그만 남긴다.
+
 ## 구조
 - `index.html`(약 61KB), 보조 사전 `extra.txt`(약 5.2만 낱말, 없어도 동작), 사전 생성 `build-extra.mjs`+`source/`(hunspell-ko 라이선스 `source/LICENSE-hunspell-ko.txt`), `vercel.json`(허브에서는 미사용). 허브 `exclude`: `source`·`build-extra.mjs`·`vercel.json` — **`extra.txt` 는 배포에 포함**돼야 한다.
 - 입력: 키보드 / 🎙️ 말하기(Web Speech, 자모 거리로 비슷한 낱말 보정·"혹시 이 말?" 후보) / ✍️ 쓰기(구글 입력도구 비공식 필기 인식) / 💡 힌트. "모르겠어·몰라·도와줘" 라고 하면 이어갈 낱말 3개를 추천하고 말로도 읽어 준다.

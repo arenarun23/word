@@ -231,6 +231,18 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
   #play:has(#hints:not([hidden])) .tool .ic,#play:has(#heard:not([hidden])) .tool .ic{font-size:1.3rem}
 }
 @media (orientation:portrait) and (min-height:900px){.choice.pc img{width:6rem;height:6rem} .result .mascot{width:11rem;height:14rem}}
+/* 목소리 고르기(세계 국기 놀이와 같은 방식): 기기에 있는 한국어 목소리 중에서 고른다 */
+.vsheet{position:fixed;inset:0;z-index:50;background:rgba(40,30,10,.45);display:flex;align-items:center;justify-content:center;padding:12px}
+.vsheet[hidden]{display:none}
+.vbox{background:var(--bg);color:var(--ink);border-radius:26px;width:min(34rem,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.vbox header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 10px 18px;font-family:var(--font-display);font-size:1.35rem}
+.vlist{overflow:auto;-webkit-overflow-scrolling:touch;padding:0 14px 14px;display:flex;flex-direction:column;gap:8px}
+.vnow{font-size:.9rem;color:var(--ink-soft);line-height:1.4}
+.vbtn{text-align:left;border:3px solid var(--line);background:var(--surface);color:var(--ink);border-radius:18px;padding:8px 14px;min-height:3.2rem;font-family:var(--font-display);font-size:1.15rem;line-height:1.25;display:flex;flex-direction:column;justify-content:center}
+.vbtn small{font-family:var(--font-body,inherit);font-size:.78rem;color:var(--ink-soft)}
+.vbtn.sel{border-color:var(--primary);background:var(--primary-soft)}
+.vhelp{font-size:.85rem;line-height:1.5;color:var(--ink-soft);background:var(--surface);border-radius:16px;padding:10px 12px}
+.vhelp b{color:var(--ink)}
 /* AIEDU 허브로 가는 아이콘 — 모든 서비스 공통 모양·위치: 페이지 왼쪽 위(body 첫 요소). 앱마다 이 자리를 비워 둔다 */
 .aiedu-home{position:absolute;left:max(8px,env(safe-area-inset-left,0px));top:max(8px,env(safe-area-inset-top,0px));z-index:1000;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:linear-gradient(160deg,#ffe58f,#ffb08e);border:2px solid #fff;box-shadow:0 2px 0 rgba(74,52,38,.22);text-decoration:none;-webkit-tap-highlight-color:transparent}
 .aiedu-home svg{width:30px;height:30px;display:block}
@@ -252,11 +264,18 @@ a.addEventListener('click',function(e){if(bad||Date.now()-born<1000){e.preventDe
 a.draggable=false;})();
 </script>
 
+<div class="vsheet" id="voiceSheet" hidden>
+  <div class="vbox" role="dialog" aria-modal="true" aria-labelledby="vTitle">
+    <header><span id="vTitle">🗣️ 목소리 고르기</span><button class="iconbtn" id="closeVoice" aria-label="닫기">✖</button></header>
+    <div class="vlist" id="vlist"></div>
+  </div>
+</div>
 <div class="app">
   <header class="top">
     <h1 class="brand">🔗 끝말잇기 놀이터</h1>
     <div style="display:flex;gap:6px">
       <button class="iconbtn" id="btnSound" aria-label="소리 켜기/끄기">🔊</button>
+      <button class="iconbtn" id="btnVoice" aria-label="목소리 고르기">🗣️</button>
       <button class="iconbtn" id="btnHome" aria-label="처음으로" hidden>🏠</button>
     </div>
   </header>
@@ -470,6 +489,60 @@ function beep(freqs){
     }
   }catch(e){}
 }
+/* ---- 목소리 고르기: 직접 고른 목소리가 있으면 그것을, 없으면 기기 기본 목소리(ko-KR)로 읽는다 ---- */
+const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+let allVoices = [];
+function loadVoices(){ try{ allVoices = synth ? synth.getVoices() : []; }catch(e){ allVoices = []; } }
+const vkey = (v) => v.voiceURI || v.name;
+const koVoices = () => allVoices.filter(v => /^ko/i.test(v.lang || ''));
+function vscore(v){        // 목록 순서: 삼성·여성·기기 안 목소리를 위로
+  const t = (v.name + ' ' + v.voiceURI).toLowerCase(); let sc = 0;
+  if (/samsung|삼성|smt/.test(t)) sc += 60;
+  if (/female|woman|여성|여자|yuna|유나|sora|소라|heami|sunhi|sun-hi|seoyeon|ism|kab|kac/.test(t)) sc += 30;
+  if (v.localService) sc += 10;
+  return sc;
+}
+function pickVoice(){
+  if (!allVoices.length) loadVoices();
+  const list = koVoices(); if (!list.length) return null;
+  const saved = store.get('wc-voice', '');
+  return (saved && list.find(v => vkey(v) === saved)) || null;   // 고르지 않았으면 기기 기본 목소리(세계 국기 놀이와 같음)
+}
+function sampleVoice(v){   // 고른 목소리로 바로 들려준다(소리 끄기와 상관없이, 직접 누른 것이므로)
+  if (!synth) return;
+  try{
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(`안녕! 나는 ${charName()}야. 같이 끝말잇기 하자!`);
+    u.lang = 'ko-KR'; u.rate = .9; if (v) u.voice = v;
+    synth.speak(u);
+  }catch(e){}
+}
+function renderVoices(){
+  loadVoices();
+  const box = $('#vlist'); box.textContent = '';
+  const add = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; box.appendChild(n); return n; };
+  const list = koVoices().slice().sort((a, b) => vscore(b) - vscore(a));
+  const saved = store.get('wc-voice', ''), chosen = saved && list.find(v => vkey(v) === saved);
+  if (!synth){ add('div', 'vhelp', '이 브라우저는 말로 읽어 주기가 안 돼요. 크롬이나 삼성 인터넷으로 열어 주세요.'); return; }
+  add('div', 'vnow', chosen ? `지금 목소리: ${chosen.name}` : '지금 목소리: 기기 기본 목소리');
+  const d = add('button', 'vbtn' + (chosen ? '' : ' sel')); d.dataset.k = '';
+  d.appendChild(document.createTextNode('기기 기본 목소리')); d.appendChild(Object.assign(document.createElement('small'), { textContent: '따로 고르지 않고 기기가 정한 목소리로 읽어요' }));
+  list.forEach(v => {
+    const b = add('button', 'vbtn' + (chosen && vkey(v) === vkey(chosen) ? ' sel' : '')); b.dataset.k = vkey(v);
+    b.appendChild(document.createTextNode(v.name));
+    b.appendChild(Object.assign(document.createElement('small'), { textContent: v.lang + (v.localService ? ' · 기기 안 목소리' : ' · 인터넷 목소리') }));
+  });
+  if (!list.length) add('div', 'vnow', '이 기기에서 한국어 목소리 목록을 찾지 못했어요. 그래도 기기 기본 목소리로 읽어 줄 수 있어요.');
+  const h = add('div', 'vhelp');
+  h.innerHTML = '<b>목소리가 이상하거나 목록이 없으면?</b><br>갤럭시: 설정 → 일반 → 언어 → <b>텍스트 음성 변환</b>에서 기본 엔진과 한국어 음성을 내려받아 고른 뒤, 이 화면을 다시 열어 주세요.';
+}
+function openVoices(){ renderVoices(); $('#voiceSheet').hidden = false; }
+function closeVoices(){ $('#voiceSheet').hidden = true; try{ synth && synth.cancel(); }catch(e){} }
+if (synth){
+  loadVoices();
+  try{ synth.addEventListener('voiceschanged', () => { loadVoices(); if (!$('#voiceSheet').hidden) renderVoices(); }); }catch(e){}
+  let vtry = 0; const vpoll = setInterval(() => { loadVoices(); if (allVoices.length || ++vtry > 20){ clearInterval(vpoll); if (!$('#voiceSheet').hidden) renderVoices(); } }, 500);   // 안드로이드는 목록이 늦게 온다
+}
 let speakId = 0;
 function speak(text, done){
   const id = ++speakId; let fin = false;
@@ -479,7 +552,7 @@ function speak(text, done){
   try{
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ko-KR'; u.rate = .9;
-    const v = speechSynthesis.getVoices().find(v => /^ko/i.test(v.lang)); if (v) u.voice = v;
+    const v = pickVoice(); if (v) u.voice = v;
     u.onstart = () => setSpeaking(true); u.onend = end; u.onerror = end;
     speechSynthesis.speak(u);
     setTimeout(end, Math.min(6000, 1500 + text.length * 250));   // 소리가 안 끝나도 게임이 멈추지 않게
@@ -513,7 +586,7 @@ setChar(charId);
 const views = { home: $('#home'), play: $('#play'), result: $('#result') };
 function show(v){
   for (const k in views) views[k].hidden = k !== v;
-  $('#btnHome').hidden = v === 'home';
+  $('#btnHome').hidden = v === 'home'; $('#btnVoice').hidden = v !== 'home';
   if (v !== 'play') { stopTimer(); G.paused = false; $('#pausebox').hidden = true; stopMic(); try{ speechSynthesis.cancel(); }catch(e){} setSpeaking(false); }
   window.scrollTo(0, 0);
 }
@@ -949,6 +1022,15 @@ function giveHelp(){
 $('#btnGo').onclick = startGame;
 $('#btnAgain').onclick = startGame;
 $('#btnHome').onclick = () => { G.over = true; show('home'); };
+$('#btnVoice').onclick = openVoices;
+$('#closeVoice').onclick = closeVoices;
+$('#voiceSheet').onclick = (e) => { if (e.target.id === 'voiceSheet') closeVoices(); };
+$('#vlist').onclick = (e) => {
+  const b = e.target.closest('.vbtn'); if (!b) return;
+  store.set('wc-voice', b.dataset.k);
+  renderVoices(); sampleVoice(pickVoice());
+  window.aieduLog && aieduLog('use', 'voice');   // 어떤 목소리인지는 기록하지 않는다
+};
 $('#btnRestart').onclick = startGame;
 $('#btnStop').onclick = () => finish(false);
 $('#btnHome2').onclick = () => show('home');
