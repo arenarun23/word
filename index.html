@@ -29,11 +29,11 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{font-size:clamp(13px,min(2.95vh,4.9vw),22px)} /* 화면 높이·폭에 맞춰 전체 크기 자동 조절 */
+html{font-size:clamp(13px,min(2.95vh,4.9vw),max(22px,2.3vh))} /* 화면 높이·폭에 맞춰 전체 크기 자동 조절 */
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:1.05rem;font-weight:700;line-height:1.45;overscroll-behavior:none}
 button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 button:focus-visible,input:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
-.app{max-width:720px;margin:0 auto;min-height:100dvh;padding:.5rem max(14px,env(safe-area-inset-right)) 1rem max(14px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:.5rem}
+.app{max-width:32.7rem;margin:0 auto;min-height:100dvh;padding:.5rem max(14px,env(safe-area-inset-right)) 1rem max(14px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:.5rem}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .brand{font-family:var(--font-display);font-weight:400;font-size:1.45rem;margin:0}
 .iconbtn{white-space:nowrap;border:2px solid var(--line);background:var(--surface);border-radius:999px;min-width:48px;height:48px;padding:0 12px;font-size:1rem;display:inline-flex;align-items:center;justify-content:center;gap:4px}
@@ -153,8 +153,8 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
 /* 가로 화면(태블릿·폰 가로·PC): 좌우 2단으로 한 화면에 */
 .colA,.colB{display:contents}
 @media (orientation:landscape) and (min-width:700px){
-  html{font-size:clamp(13px,min(3.6vh,2.1vw),22px)}
-  .app{max-width:1040px}
+  html{font-size:clamp(13px,min(3.6vh,2.1vw),80px)}   /* 큰 태블릿·모니터에서도 화면에 맞춰 함께 커진다 */
+  .app{max-width:54rem}   /* 옆으로 긴 화면도 좌우를 더 쓰도록 */
   #home{display:grid;grid-template-columns:1fr 1.15fr;grid-template-areas:"hero g1" "hero g2" "best go";gap:.4rem 1.2rem;align-items:center}
   #gPick{grid-area:hero} #gFirst{grid-area:g1} #gLevel{grid-area:g2}
   .choice.pc{flex-direction:column;text-align:center;padding:10px 8px} .choice.pc img{width:100%;height:min(9rem,34vh)} .choice.pc .tx{align-items:center}
@@ -166,7 +166,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
   .card .pic{font-size:2.4rem} .card .need{font-size:1.05rem} .say{font-size:1rem}
   #play.padopen .chain{display:none}
   #home .group{margin:0!important} #home .best{grid-area:best;margin:0} #home .go{grid-area:go;margin:0 auto}
-  #play{display:grid;grid-template-columns:1fr 1fr;gap:0 1.2rem;align-items:start}
+  #play{display:grid;grid-template-columns:1.2fr 1fr;gap:0 1.2rem;align-items:start}
   .colA,.colB{display:flex;flex-direction:column;gap:.4rem;min-width:0}
   .chain{max-height:4.6rem}
   /* 낮은 화면에서는 키운 버튼을 한 단계 줄여 한 화면에 맞춤(터치 크기는 충분히 유지) */
@@ -174,6 +174,28 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
   .entry input{padding:.45rem 14px;font-size:1.4rem} .ok-btn{font-size:1.3rem}
   .hint{min-height:0;padding:.35rem 14px;font-size:1.2rem} .quit{min-height:0;padding:.3rem 1.2rem;font-size:.95rem}
   .giveup .row button{padding:.5rem 1.2rem;font-size:1.2rem}
+}
+/* 가로 화면 채우기: 시작·결과 화면은 높이 가운데에, 놀이 화면 오른쪽 칸은 아래까지 쓴다 */
+@media (orientation:landscape) and (min-width:700px){
+  .app:has(#home:not([hidden])),.app:has(#result:not([hidden])){height:100dvh;min-height:0}
+  #home{flex:1;min-height:0;align-content:space-evenly}
+  #result{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem}
+  #result>*{flex:none} #result h2{margin:.2rem 0} #result .chain{margin:.3rem 0;max-height:5.2rem}
+  #result .mascot{width:auto;height:min(9.5rem,24vh);aspect-ratio:.62}
+  .colB{align-self:stretch;min-height:0}
+  .colB .tool{min-height:4.6rem;flex-direction:column;gap:.1rem;font-size:1.15rem} .colB .tool .ic{font-size:1.75rem}
+  .colB .entry input{padding:.6rem 16px;font-size:1.6rem} .colB .ok-btn{font-size:1.45rem}
+  .colB .chain{flex:1 1 auto;max-height:none;min-height:2.6rem;align-content:flex-start}
+  #play.padopen .pad{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+  #play.padopen .padbox{flex:1 1 auto;height:auto;min-height:6.2rem}
+  #play.padopen .colB .tool{min-height:3.2rem;flex-direction:row;gap:.35rem;font-size:1.1rem} #play.padopen .colB .tool .ic{font-size:1.3rem}
+  /* 말풍선 낱말은 무대 크기에 맞춰(좁은 칸에서 줄바꿈되지 않게) */
+  .card .big{font-size:min(4.6rem,17cqw,30cqh)} .card .big.long{font-size:min(3.4rem,10.5cqw,24cqh)} .card .big.xlong{font-size:min(2.5rem,6.6cqw,18cqh)}
+}
+@media (orientation:landscape) and (max-height:420px){
+  #result .mascot{height:22vh} #result .chain{max-height:3.6rem}
+  .colB .tool{min-height:3rem;flex-direction:row;gap:.3rem;font-size:1.05rem} .colB .tool .ic{font-size:1.25rem}
+  .colB .entry input{padding:.4rem 12px;font-size:1.35rem} .colB .ok-btn{font-size:1.25rem}
 }
 /* 키가 작은 세로 화면(작은 폰): 버튼 높이를 조금만 줄임 */
 @media (orientation:portrait) and (max-height:700px){
@@ -220,7 +242,7 @@ h2{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin:0 0 8
   #play .tools,#play .hints,#play .chain,#play .pad{margin-top:0!important}
   #play .quit{align-self:center}
 }
-#play.padopen .stage{container-type:normal}
+@media (orientation:portrait){#play.padopen .stage{container-type:normal}}   /* 세로에서 필기판을 열 때만(가로에서는 무대 크기 기준 유지) */
 .card{overflow:hidden} .card::before{z-index:1}
 @container (max-height:12.5rem){.card .who{display:none} .card .need{font-size:.82rem;margin-top:0;line-height:1.3} .need b{font-size:1.2rem} .card .big{font-size:clamp(1.7rem,8.4vw,2.6rem)} .card .pic{font-size:1.4rem}}
 @container (max-height:10.5rem){.card .need small{display:none} .card .need{font-size:.74rem;white-space:nowrap} .card .big{font-size:clamp(1.5rem,7.4vw,2.2rem)} .card{padding:2px 6px} .say{min-height:0;max-height:2.9em;font-size:.84rem;padding:3px 8px}}
